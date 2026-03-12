@@ -5,10 +5,11 @@ import { solvePuzzle } from './solver';
 
 let cache: Puzzle[] | null = null;
 
-export function getTierFromScore(score: number): DifficultyTier {
-  if (score < 160) return 'Easy';
-  if (score < 260) return 'Medium';
-  if (score < 420) return 'Hard';
+/** AMT (adjusted median time) in seconds from 4nums.com - higher = harder */
+export function getTierFromScore(amt: number): DifficultyTier {
+  if (amt < 15) return 'Easy';
+  if (amt < 35) return 'Medium';
+  if (amt < 80) return 'Hard';
   return 'Expert';
 }
 
@@ -53,3 +54,4 @@ export function listTiersWithCounts() {
     count: puzzles.filter((puzzle) => puzzle.tier === tier).length
   }));
 }
+

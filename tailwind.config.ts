@@ -16,13 +16,15 @@ const config: Config = {
         'accent-soft': 'rgb(var(--accent-soft))',
       },
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        sans: ['DM Sans', 'system-ui', 'sans-serif'],
+        display: ['Syne', 'system-ui', 'sans-serif'],
         mono: ['ui-monospace', 'monospace'],
       },
       boxShadow: {
         panel: '0 1px 0 rgba(255,255,255,0.05), 0 4px 24px rgba(0,0,0,0.4)',
         'panel-lg': '0 1px 0 rgba(255,255,255,0.06), 0 8px 40px rgba(0,0,0,0.5)',
         glow: '0 0 60px rgba(34, 211, 238, 0.15)',
+        'glow-amber': '0 0 40px rgba(251, 191, 36, 0.2)',
         'inner-soft': 'inset 0 1px 0 rgba(255,255,255,0.04)',
       },
       borderRadius: {
