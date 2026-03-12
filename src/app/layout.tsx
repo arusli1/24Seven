@@ -3,6 +3,10 @@ import './globals.css';
 import { ReactNode } from 'react';
 import { Nav } from '@/components/nav';
 import { Footer } from '@/components/footer';
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: '24 — Master the Numbers',
@@ -11,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={cn("dark", "font-sans", geist.variable)}>
       <body className="antialiased bg-[rgb(var(--bg-base))]">
         <div className="flex min-h-screen flex-col">
           <Nav />
