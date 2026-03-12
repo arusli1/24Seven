@@ -76,8 +76,6 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
   const [op, setOp] = useState<Operator | null>(null);
   const [showSolution, setShowSolution] = useState(false);
   const [difficultyBias, setDifficultyBias] = useState(0.5); // 0 = easy, 1 = hard
-  const [solvedCount, setSolvedCount] = useState(0);
-  const [sessionStart, setSessionStart] = useState<number | null>(null);
   const [elapsedSec, setElapsedSec] = useState(0);
   const peekedRef = useRef(false);
 
@@ -102,14 +100,12 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
   }, [puzzles.length, puzzle, loadNewPuzzle]);
 
   useEffect(() => {
-    if (puzzle && sessionStart === null) setSessionStart(Date.now());
-  }, [puzzle, sessionStart]);
-
-  useEffect(() => {
-    if (!sessionStart) return;
-    const t = setInterval(() => setElapsedSec(Math.floor((Date.now() - sessionStart) / 1000)), 1000);
+    if (!puzzle) return;
+    const start = Date.now();
+    setElapsedSec(0);
+    const t = setInterval(() => setElapsedSec(Math.floor((Date.now() - start) / 1000)), 1000);
     return () => clearInterval(t);
-  }, [sessionStart]);
+  }, [puzzle]);
 
   useEffect(() => {
     if (!puzzle) return;
@@ -128,10 +124,9 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
 
   const solved = cards.length === 1 && cards[0].value.equals(TARGET);
 
-  // Auto-load next puzzle when solved (only count if they didn't peek)
+  // Auto-load next puzzle when solved
   useEffect(() => {
     if (!solved) return;
-    if (!peekedRef.current) setSolvedCount((c) => c + 1);
     const t = setTimeout(loadNewPuzzle, 500);
     return () => clearTimeout(t);
   }, [solved, loadNewPuzzle]);
@@ -209,12 +204,9 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
             {(puzzle.solveRate * 100).toFixed(1)}% solve rate
           </span>
         )}
-        {(solvedCount > 0 || elapsedSec > 0) && (
-          <span className="game24-session-stats">
-            {solvedCount} solved
-            {elapsedSec > 0 && ` · ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`}
-          </span>
-        )}
+        <span className="game24-timer">
+          {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
+        </span>
       </div>
       <div className="game24-actions">
         <button
