@@ -1,0 +1,40 @@
+{
+  "name": "24-game-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest",
+    "import:difficulties": "tsx scripts/import-difficulties.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev"
+  },
+  "dependencies": {
+    "@prisma/client": "5.11.0",
+    "clsx": "2.0.0",
+    "next": "14.1.0",
+    "node-html-parser": "6.1.11",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "zustand": "4.5.2",
+    "zod": "3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.19",
+    "@types/react": "18.2.53",
+    "@types/react-dom": "18.2.18",
+    "autoprefixer": "10.4.17",
+    "eslint": "8.56.0",
+    "eslint-config-next": "14.1.0",
+    "postcss": "8.4.35",
+    "prisma": "5.11.0",
+    "tailwindcss": "3.4.1",
+    "ts-node": "10.9.2",
+    "tsx": "4.7.1",
+    "typescript": "5.3.3",
+    "vitest": "1.3.1"
+  }
+}
