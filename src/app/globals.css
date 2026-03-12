@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 * {
   -webkit-tap-highlight-color: transparent;
@@ -10,17 +10,17 @@
 }
 
 :root {
-  --game24-bg: #0c0c0e;
-  --game24-bg-card: #141416;
-  --game24-border: rgba(255,255,255,0.06);
-  --game24-accent: #22d3ee;
-  --game24-accent-dim: #0891b2;
-  --game24-accent-glow: rgba(34,211,238,0.15);
-  --game24-muted: #71717a;
-  --game24-muted-bg: #1f1f23;
-  --game24-success: #34d399;
-  --game24-success-bg: rgba(52,211,153,0.12);
-  --game24-error: #f87171;
+  --game24-bg: #0a0a0a;
+  --game24-bg-card: #111111;
+  --game24-border: rgba(255,255,255,0.08);
+  --game24-accent: #8B1538;
+  --game24-accent-hover: #A91D4A;
+  --game24-accent-glow: rgba(139,21,56,0.25);
+  --game24-muted: #737373;
+  --game24-muted-bg: #1a1a1a;
+  --game24-success: #525252;
+  --game24-success-bg: rgba(139,21,56,0.15);
+  --game24-error: #8B1538;
 }
 
 html, body {
@@ -29,9 +29,9 @@ html, body {
   height: 100%;
   min-height: 100dvh;
   overflow: hidden;
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--game24-bg);
-  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34,211,238,0.08), transparent);
+  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139,21,56,0.08), transparent);
   color: #fafafa;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -105,11 +105,11 @@ html, body {
   font-family: inherit;
 }
 .game24-tab:hover {
-  color: #d4d4d8;
+  color: #e5e5e5;
 }
 .game24-tab.active {
   background: var(--game24-accent);
-  color: #0c0c0e;
+  color: white;
   box-shadow: 0 2px 8px var(--game24-accent-glow);
 }
 
@@ -190,13 +190,13 @@ html, body {
 }
 .game24-solver-none {
   font-size: 0.9375rem;
-  color: var(--game24-error);
+  color: var(--game24-muted);
 }
 .game24-solver-list {
   margin: 0;
   padding-left: 20px;
   font-size: 0.9rem;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: inherit;
   color: #a1a1aa;
   line-height: 1.7;
 }
@@ -325,21 +325,21 @@ html, body {
 
 .game24-btn-primary {
   background: var(--game24-accent);
-  color: #0c0c0e;
+  color: white;
 }
 .game24-btn-primary:hover {
-  background: #67e8f9;
+  background: var(--game24-accent-hover);
   box-shadow: 0 4px 16px var(--game24-accent-glow);
 }
 
 .game24-btn-secondary {
   background: var(--game24-muted-bg);
-  color: #a1a1aa;
+  color: var(--game24-muted);
   border: 1px solid var(--game24-border);
 }
 .game24-btn-secondary:hover:not(:disabled) {
-  background: #27272a;
-  color: #e4e4e7;
+  background: #262626;
+  color: #fafafa;
 }
 .game24-btn-secondary:disabled {
   opacity: 0.4;
@@ -348,15 +348,15 @@ html, body {
 .game24-btn-nav {
   padding: 10px 14px;
   background: var(--game24-muted-bg);
-  color: #a1a1aa;
+  color: var(--game24-muted);
   font-size: 1.1rem;
   font-weight: 600;
   line-height: 1;
   border: 1px solid var(--game24-border);
 }
 .game24-btn-nav:hover:not(:disabled) {
-  background: #27272a;
-  color: #e4e4e7;
+  background: #262626;
+  color: #fafafa;
 }
 .game24-btn-nav:disabled {
   opacity: 0.4;
@@ -391,21 +391,21 @@ html, body {
   font-family: inherit;
 }
 .game24-num-card:hover {
-  background: #27272a;
-  border-color: rgba(34,211,238,0.3);
+  background: #262626;
+  border-color: rgba(139,21,56,0.4);
 }
 .game24-num-card:active {
   transform: scale(0.98);
 }
 .game24-num-card.selected {
-  background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(8,145,178,0.15));
+  background: rgba(139,21,56,0.18);
   border-color: var(--game24-accent);
   box-shadow: 0 0 0 2px var(--game24-accent-glow);
 }
 .game24-num-card.solved {
   background: var(--game24-success-bg);
-  border-color: var(--game24-success);
-  color: var(--game24-success);
+  border-color: var(--game24-accent);
+  color: #fafafa;
 }
 
 .game24-fraction {
@@ -448,16 +448,16 @@ html, body {
   font-family: inherit;
 }
 .game24-op:hover {
-  background: #27272a;
-  color: var(--game24-accent);
-  border-color: rgba(34,211,238,0.3);
+  background: #262626;
+  color: var(--game24-accent-hover);
+  border-color: rgba(139,21,56,0.4);
 }
 .game24-op:active {
   transform: scale(0.95);
 }
 .game24-op.selected {
   background: var(--game24-accent);
-  color: #0c0c0e;
+  color: white;
   border-color: var(--game24-accent);
 }
 
@@ -476,7 +476,7 @@ html, body {
   border-radius: 12px;
   border: 1px solid var(--game24-border);
   font-size: 0.9rem;
-  font-family: ui-monospace, monospace;
+  font-family: inherit;
   color: #a1a1aa;
   word-break: break-all;
   flex-shrink: 0;

@@ -4,19 +4,19 @@ import { useState } from 'react';
 import { findAllSolutions } from '@/lib/solver';
 
 export function Solver() {
-  const [nums, setNums] = useState<[number, number, number, number]>([1, 2, 3, 4]);
+  const [inputs, setInputs] = useState<string[]>(['1', '2', '3', '4']);
   const [solutions, setSolutions] = useState<string[] | null>(null);
 
   const solve = () => {
-    const result = findAllSolutions([...nums]);
+    const nums = inputs.map((s) => Math.max(0, Math.round(Number(s) || 0)));
+    const result = findAllSolutions(nums);
     setSolutions(result);
   };
 
-  const setNum = (i: number, v: number) => {
-    const n = Math.max(1, Math.min(13, Math.round(v)));
-    setNums((prev) => {
-      const next = [...prev] as [number, number, number, number];
-      next[i] = n;
+  const setInput = (i: number, v: string) => {
+    setInputs((prev) => {
+      const next = [...prev];
+      next[i] = v;
       return next;
     });
     setSolutions(null);
@@ -24,16 +24,16 @@ export function Solver() {
 
   return (
     <div className="game24-game-inner">
-      <p className="game24-solver-desc">Enter 4 numbers (1–13), get all solutions.</p>
+      <p className="game24-solver-desc">Enter any 4 numbers, get all solutions.</p>
       <div className="game24-solver-grid">
-        {nums.map((n, i) => (
+        {inputs.map((val, i) => (
           <input
             key={i}
             type="number"
-            min={1}
-            max={13}
-            value={n}
-            onChange={(e) => setNum(i, Number(e.target.value) || 1)}
+            min={0}
+            value={val}
+            placeholder=""
+            onChange={(e) => setInput(i, e.target.value)}
             className="game24-solver-input"
           />
         ))}

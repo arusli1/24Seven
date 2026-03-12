@@ -17,9 +17,16 @@ export function loadPuzzles(): Puzzle[] {
   if (cache) return cache;
   const mainPath = path.join(process.cwd(), 'data', 'difficulties.json');
   const samplePath = path.join(process.cwd(), 'data', 'difficulties.sample.json');
+  const hardPath = path.join(process.cwd(), 'data', 'hard-puzzles.json');
   const filePath = existsSync(mainPath) ? mainPath : samplePath;
   const raw = JSON.parse(readFileSync(filePath, 'utf-8')) as { puzzles: { nums: number[]; difficulty: number; solveRate?: number }[] };
-  cache = raw.puzzles.map((entry, index) => {
+  const rawEntries = raw.puzzles as { nums: number[]; difficulty: number; solveRate?: number }[];
+  let entries: { nums: number[]; difficulty: number; solveRate?: number; custom?: boolean }[] = rawEntries.map((e) => ({ ...e }));
+  if (existsSync(hardPath)) {
+    const hard = JSON.parse(readFileSync(hardPath, 'utf-8')) as { puzzles: { nums: number[]; difficulty: number; solveRate?: number }[] };
+    entries = [...entries, ...hard.puzzles.map((e) => ({ ...e, custom: true }))];
+  }
+  cache = entries.map((entry, index) => {
     const solution = solvePuzzle(entry.nums);
     return {
       id: `${entry.nums.join('-')}-${index}`,
@@ -27,6 +34,7 @@ export function loadPuzzles(): Puzzle[] {
       difficulty: entry.difficulty,
       tier: getTierFromScore(entry.difficulty),
       solveRate: entry.solveRate,
+      custom: entry.custom,
       solutions: solution ? [solution.expression] : undefined
     };
   });

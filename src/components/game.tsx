@@ -51,8 +51,9 @@ function pickWeightedPuzzle(puzzles: Puzzle[], bias: number, excludeIds: string[
   if (pool.length === 0) return puzzles[Math.floor(Math.random() * puzzles.length)];
   const sr = (p: Puzzle) => p.solveRate ?? 0.5;
   // When bias is high, only allow low solve-rate puzzles (hard = actually hard)
+  // Custom puzzles (N/A solve rate) qualify when bias >= 0.5
   const maxSolveRate = bias >= 0.8 ? 0.35 : bias >= 0.6 ? 0.5 : bias >= 0.4 ? 0.65 : 1;
-  const hardPool = pool.filter((p) => sr(p) <= maxSolveRate);
+  const hardPool = pool.filter((p) => (p.custom && bias >= 0.5) || sr(p) <= maxSolveRate);
   if (hardPool.length > 0) pool = hardPool;
   const weights = pool.map((p) => (1 - bias) * sr(p) + bias * (1 - sr(p)));
   const total = weights.reduce((a, b) => a + b, 0);
@@ -75,7 +76,7 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
   const [sel, setSel] = useState<string | null>(null);
   const [op, setOp] = useState<Operator | null>(null);
   const [showSolution, setShowSolution] = useState(false);
-  const [difficultyBias, setDifficultyBias] = useState(0.5); // 0 = easy, 1 = hard
+  const [difficultyBias, setDifficultyBias] = useState(1); // 0 = easy, 1 = hard (default hardest)
   const [elapsedSec, setElapsedSec] = useState(0);
   const peekedRef = useRef(false);
 
@@ -199,11 +200,9 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
         </div>
       </div>
       <div className="game24-stats">
-        {puzzle.solveRate != null && (
-          <span className="game24-solve-rate">
-            {(puzzle.solveRate * 100).toFixed(1)}% solve rate
-          </span>
-        )}
+        <span className="game24-solve-rate">
+          {puzzle.custom ? 'Solve rate N/A' : puzzle.solveRate != null ? `${(puzzle.solveRate * 100).toFixed(1)}% solve rate` : 'Solve rate N/A'}
+        </span>
         <span className="game24-timer">
           {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
         </span>

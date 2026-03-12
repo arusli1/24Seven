@@ -6,6 +6,7 @@ export interface Puzzle {
   difficulty: number;
   tier: DifficultyTier;
   solveRate?: number;
+  custom?: boolean;
   solutions?: string[];
 }
 
