@@ -5,7 +5,7 @@ import { Puzzle } from '@/lib/types';
 import { getHints } from '@/lib/solver';
 import { Rational } from '@/lib/rational';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 interface Props {
   puzzles: Puzzle[];
@@ -59,7 +59,7 @@ export function PlayClient({ puzzles }: Props) {
   const [history, setHistory] = useState<CardState[][]>([]);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [operator, setOperator] = useState<Operator | null>(null);
-  const [message, setMessage] = useState('Select a card to start.');
+  const [message, setMessage] = useState('');
   const [visibleHints, setVisibleHints] = useState(0);
 
   const hasPuzzles = puzzles.length > 0;
@@ -71,7 +71,7 @@ export function PlayClient({ puzzles }: Props) {
     setHistory([]);
     setSelectedCard(null);
     setOperator(null);
-    setMessage('Select a card to start.');
+    setMessage('');
     setVisibleHints(0);
   }, [currentPuzzle]);
 
@@ -81,7 +81,7 @@ export function PlayClient({ puzzles }: Props) {
   const handleCardClick = (id: string) => {
     if (!operator) {
       setSelectedCard(id);
-      setMessage('Pick an operator.');
+      setMessage('');
       return;
     }
     if (!selectedCard || selectedCard === id) {
@@ -109,7 +109,7 @@ export function PlayClient({ puzzles }: Props) {
       setCards([...nextCards, newCard]);
       setSelectedCard(null);
       setOperator(null);
-      setMessage(cards.length === 2 && resultValue.equals(TARGET) ? 'That makes 24!' : 'Select the next card.');
+      setMessage('');
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Invalid move.');
       setOperator(null);
@@ -125,99 +125,93 @@ export function PlayClient({ puzzles }: Props) {
       setCards(last);
       setSelectedCard(null);
       setOperator(null);
-      setMessage('Move undone.');
+      setMessage('');
       return copy;
     });
   };
 
   if (!currentPuzzle) {
-    return <p className="text-center text-lg text-rose-400">No puzzles. Run <code className="text-rose-300">npm run import:difficulties</code></p>;
+    return <p className="text-center text-rose-400">No puzzles. Run <code className="text-rose-300">npm run import:difficulties</code></p>;
   }
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col items-center space-y-8">
-      <Card className="w-full max-w-2xl space-y-8">
-        <div className="flex items-center justify-center gap-4">
-          <Button variant="outline" size="md" onClick={() => setPuzzleIndex((prev) => prev + 1)}>
-            New puzzle
+    <div className="flex w-full max-w-2xl flex-col items-center gap-8">
+      <Card className="w-full border-border/50 bg-card/50 shadow-xl">
+        <CardHeader className="flex flex-row items-center justify-center gap-4 pb-4">
+          <Button variant="outline" size="lg" onClick={() => setPuzzleIndex((prev) => prev + 1)}>
+            New
           </Button>
-          <Button variant="ghost" size="md" onClick={undoLast} disabled={history.length === 0}>
+          <Button variant="ghost" size="lg" onClick={undoLast} disabled={history.length === 0}>
             Undo
           </Button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
-          {cards.map((card) => (
-            <button
-              key={card.id}
-              onClick={() => handleCardClick(card.id)}
-              className={`flex flex-col items-center justify-center rounded-2xl border-2 px-6 py-8 text-center transition-all duration-200 active:scale-[0.98] sm:px-8 sm:py-10 ${
-                selectedCard === card.id
-                  ? 'border-[rgb(var(--accent))] bg-[rgb(var(--accent))]/10'
-                  : solved && cards[0].id === card.id
-                    ? 'border-emerald-500/50 bg-emerald-500/10'
-                    : 'border-white/[0.08] bg-white/[0.04] hover:border-white/[0.12] hover:bg-white/[0.06]'
-              }`}
-            >
-              <p className="text-4xl font-semibold text-white sm:text-5xl">{card.label}</p>
-              <p className="mt-2 font-mono text-base text-zinc-400">{card.expression}</p>
-            </button>
-          ))}
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-4">
-          {OPERATORS.map(({ op, symbol }) => (
-            <Button
-              key={op}
-              variant={operator === op ? 'solid' : 'outline'}
-              size="lg"
-              className="min-w-[4rem] text-2xl"
-              onClick={() => {
-                if (!selectedCard) {
-                  setMessage('Select a card first.');
-                  return;
-                }
-                setOperator(op);
-                setMessage('Select another card to apply the operator.');
-              }}
-            >
-              {symbol}
-            </Button>
-          ))}
-        </div>
-
-        <p className="text-center text-base text-zinc-400 sm:text-lg">{message}</p>
-        {solved && (
-          <p className="text-center text-base font-medium text-emerald-400 sm:text-lg">
-            Solved in {history.length + 1} steps. {cards[0]?.expression}
-          </p>
-        )}
-      </Card>
-
-      <Card className="w-full max-w-2xl space-y-6">
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-          <p className="text-xl font-medium text-white">Hints</p>
-          <Button
-            variant="outline"
-            size="md"
-            onClick={() => setVisibleHints((prev) => Math.min(prev + 1, hints.length))}
-            disabled={visibleHints >= hints.length}
-          >
-            Reveal hint
+          <Button variant="outline" size="lg" onClick={() => setVisibleHints((p) => Math.min(p + 1, hints.length))} disabled={visibleHints >= hints.length}>
+            Hint
           </Button>
-        </div>
-        {visibleHints === 0 && <p className="text-center text-base text-zinc-400 sm:text-lg">No hints shown.</p>}
-        <ul className="space-y-3 text-base text-zinc-300 sm:text-lg">
-          {hints.slice(0, visibleHints).map((hint, index) => (
-            <li key={index} className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-              {hint.description}
-              {hint.expression && (
-                <span className="font-mono text-sm text-zinc-500">{hint.expression}</span>
-              )}
-            </li>
-          ))}
-        </ul>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          {/* Number cards - bigger, centered, card-like */}
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            {cards.map((card) => (
+              <button
+                key={card.id}
+                onClick={() => handleCardClick(card.id)}
+                className={`flex h-24 w-20 flex-col items-center justify-center rounded-2xl border-2 shadow-lg transition-all duration-200 active:scale-95 sm:h-28 sm:w-24 ${
+                  selectedCard === card.id
+                    ? 'border-primary bg-primary/20 shadow-lg'
+                    : solved && cards[0].id === card.id
+                      ? 'border-emerald-500/60 bg-emerald-500/20 shadow-emerald-500/20'
+                      : 'border-border bg-card hover:border-primary/50 hover:shadow-md'
+                }`}
+              >
+                <span className="text-4xl font-bold text-foreground sm:text-5xl">{card.label}</span>
+                {card.expression !== card.label && (
+                  <span className="mt-1 font-mono text-xs text-muted-foreground">{card.expression}</span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Operator buttons - prominent */}
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {OPERATORS.map(({ op, symbol }) => (
+              <Button
+                key={op}
+                variant={operator === op ? 'default' : 'outline'}
+                size="lg"
+                className="h-14 min-w-[4rem] text-2xl"
+                onClick={() => {
+                  if (!selectedCard) return;
+                  setOperator(op);
+                }}
+              >
+                {symbol}
+              </Button>
+            ))}
+          </div>
+
+          {message && <p className="text-center text-sm text-destructive">{message}</p>}
+          {solved && (
+            <p className="text-center text-lg font-medium text-emerald-400">
+              ✓ {history.length + 1} steps
+            </p>
+          )}
+        </CardContent>
       </Card>
+
+      {visibleHints > 0 && (
+        <Card className="w-full max-w-2xl border-border/50 bg-card/50">
+          <CardContent className="pt-6">
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              {hints.slice(0, visibleHints).map((hint, i) => (
+                <li key={i} className="flex gap-2">
+                  <span className="font-mono text-xs">{hint.expression}</span>
+                  — {hint.description}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
