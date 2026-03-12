@@ -112,13 +112,16 @@ export function SpeedrunClient({ puzzles }: Props) {
     ? Math.round(solveDurations.reduce((sum, value) => sum + value, 0) / solveDurations.length)
     : 0;
 
-  const summary: SpeedrunSummary = useMemo(() => ({
-    puzzlesSolved,
-    totalAttempts,
-    invalidAttempts,
-    averageSolveMs,
-    timeLimit
-  }), [puzzlesSolved, totalAttempts, invalidAttempts, averageSolveMs, timeLimit]);
+  const summary: SpeedrunSummary = useMemo(
+    () => ({
+      puzzlesSolved,
+      totalAttempts,
+      invalidAttempts,
+      averageSolveMs,
+      timeLimit,
+    }),
+    [puzzlesSolved, totalAttempts, invalidAttempts, averageSolveMs, timeLimit]
+  );
 
   const submitScore = async () => {
     try {
@@ -133,8 +136,8 @@ export function SpeedrunClient({ puzzles }: Props) {
           puzzlesSolved,
           totalAttempts,
           invalidAttempts,
-          averageSolveMs: averageSolveMs || 0
-        })
+          averageSolveMs: averageSolveMs || 0,
+        }),
       });
       if (!response.ok) {
         const body = await response.json();
@@ -150,26 +153,36 @@ export function SpeedrunClient({ puzzles }: Props) {
   };
 
   if (!currentPuzzle) {
-    return <p className="text-sm text-red-500">No puzzles available. Import difficulties first.</p>;
+    return <p className="text-sm text-rose-600">No puzzles available. Import difficulties first.</p>;
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         {LIMITS.map((limit) => (
           <button
             key={limit}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${timeLimit === limit ? 'bg-accent text-white' : 'bg-slate-100 text-slate-600'}`}
+            className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
+              timeLimit === limit
+                ? 'bg-[rgb(var(--accent))] text-white shadow-panel'
+                : 'bg-[rgb(var(--bg-base))] text-[rgb(var(--ink-muted))] hover:bg-[rgb(var(--border))]/50'
+            }`}
             onClick={() => setTimeLimit(limit)}
             disabled={running}
           >
             {limit}s
           </button>
         ))}
-        <Button onClick={startRun}>{running ? 'Restart' : 'Start speedrun'}</Button>
-        <span className="rounded-full bg-slate-900 px-4 py-1 text-sm font-mono text-white">{(timeLeft / 1000).toFixed(1)}s left</span>
+        <Button onClick={startRun} size="lg">
+          {running ? 'Restart' : 'Start speedrun'}
+        </Button>
+        <span className="rounded-xl bg-[rgb(var(--ink))] px-4 py-2 font-mono text-sm font-semibold text-white">
+          {(timeLeft / 1000).toFixed(1)}s left
+        </span>
       </div>
-      <PuzzleCards numbers={currentPuzzle.numbers} tier={currentPuzzle.tier} showTier />
+
+      <PuzzleCards numbers={currentPuzzle.numbers} />
+
       <ExpressionInput
         value={expression}
         onChange={setExpression}
@@ -177,21 +190,24 @@ export function SpeedrunClient({ puzzles }: Props) {
         onClear={() => setExpression('')}
         onCheck={handleCheck}
       />
-      <p className="text-sm text-slate-500">{status || 'Type your expression and press Enter.'}</p>
+
+      <p className="text-sm text-[rgb(var(--ink-muted))]">{status || 'Type your expression and press Enter.'}</p>
+
       <Keypad onInsert={(value) => setExpression((prev) => `${prev}${value}`)} />
+
       {!running && puzzlesSolved > 0 && (
-        <div className="space-y-4 rounded-3xl bg-white/80 p-6 shadow-card">
-          <h3 className="text-lg font-semibold text-slate-900">Run summary</h3>
+        <div className="space-y-5 rounded-3xl border border-[rgb(var(--border))]/60 bg-[rgb(var(--surface))] p-6 shadow-panel sm:p-8">
+          <h3 className="font-display text-xl font-semibold text-[rgb(var(--ink))]">Run summary</h3>
           <SpeedrunStats summary={summary} />
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-600">Submit to leaderboard</label>
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-[rgb(var(--ink))]">Submit to leaderboard</label>
             <input
               value={nickname}
               onChange={(event) => setNickname(event.target.value)}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-2"
+              className="w-full rounded-xl border-2 border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-4 py-2.5 transition-colors placeholder:text-[rgb(var(--ink-subtle))] focus:border-[rgb(var(--accent))] focus:outline-none"
               placeholder="Nickname"
             />
-            <Button onClick={submitScore} disabled={saving}>
+            <Button onClick={submitScore} disabled={saving} size="lg">
               {saving ? 'Saving…' : 'Submit score'}
             </Button>
           </div>

@@ -18,12 +18,12 @@ export function ExpressionInput({ value, onChange, onCheck, onClear, onBackspace
 
   return (
     <div className="flex flex-col gap-3">
-      <label htmlFor="expression" className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+      <label htmlFor="expression" className="text-sm font-semibold uppercase tracking-wide text-[rgb(var(--ink-muted))]">
         Your expression
       </label>
       <input
         id="expression"
-        className="rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-lg font-mono shadow-inner focus:border-accent"
+        className="rounded-xl border-2 border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-4 py-3 font-mono text-lg shadow-inner-soft transition-colors placeholder:text-[rgb(var(--ink-subtle))] focus:border-[rgb(var(--accent))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))]/20"
         placeholder="(8 / (3 - 2)) * 6"
         value={value}
         onChange={handleChange}
@@ -34,8 +34,10 @@ export function ExpressionInput({ value, onChange, onCheck, onClear, onBackspace
           }
         }}
       />
-      <div className="flex flex-wrap gap-3">
-        <Button onClick={onCheck}>Check</Button>
+      <div className="flex flex-wrap gap-2">
+        <Button onClick={onCheck} size="lg">
+          Check
+        </Button>
         <Button variant="outline" onClick={onClear}>
           Clear
         </Button>

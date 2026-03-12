@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Puzzle, DifficultyTier } from '@/lib/types';
-import { getHints, solvePuzzle } from '@/lib/solver';
+import { Puzzle } from '@/lib/types';
+import { getHints } from '@/lib/solver';
 import { Rational } from '@/lib/rational';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -20,7 +20,6 @@ interface CardState {
   expression: string;
 }
 
-const tiers: (DifficultyTier | 'All')[] = ['All', 'Easy', 'Medium', 'Hard', 'Expert'];
 const TARGET = new Rational(24, 1);
 
 function createCards(numbers: number[]): CardState[] {
@@ -48,7 +47,6 @@ function combineValues(a: Rational, b: Rational, operator: Operator) {
 }
 
 export function PlayClient({ puzzles }: Props) {
-  const [tierFilter, setTierFilter] = useState<(typeof tiers)[number]>('All');
   const [puzzleIndex, setPuzzleIndex] = useState(0);
   const [cards, setCards] = useState<CardState[]>([]);
   const [history, setHistory] = useState<CardState[][]>([]);
@@ -57,9 +55,8 @@ export function PlayClient({ puzzles }: Props) {
   const [message, setMessage] = useState('Select a card to start.');
   const [visibleHints, setVisibleHints] = useState(0);
 
-  const filtered = useMemo(() => (tierFilter === 'All' ? puzzles : puzzles.filter((puzzle) => puzzle.tier === tierFilter)), [puzzles, tierFilter]);
-  const hasPuzzles = filtered.length > 0;
-  const currentPuzzle = hasPuzzles ? filtered[puzzleIndex % filtered.length] : null;
+  const hasPuzzles = puzzles.length > 0;
+  const currentPuzzle = hasPuzzles ? puzzles[puzzleIndex % puzzles.length] : null;
 
   useEffect(() => {
     if (!currentPuzzle) return;
@@ -127,76 +124,88 @@ export function PlayClient({ puzzles }: Props) {
   };
 
   if (!currentPuzzle) {
-    return <p className="text-sm text-red-600">No puzzles available. Run the importer.</p>;
+    return <p className="text-sm text-rose-600">No puzzles. Run <code>npm run import:difficulties</code></p>;
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-2">
-        {tiers.map((tier) => (
-          <Button key={tier} variant={tierFilter === tier ? 'solid' : 'outline'} size="sm" onClick={() => setTierFilter(tier)}>
-            {tier}
+      <Card className="space-y-6">
+        <div className="flex items-center justify-end gap-2">
+          <Button variant="outline" size="sm" onClick={() => setPuzzleIndex((prev) => prev + 1)}>
+            New puzzle
           </Button>
-        ))}
-      </div>
-
-      <Card className="space-y-4 border border-outline shadow-panel">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-muted">{currentPuzzle.tier} • {currentPuzzle.difficulty}</p>
-            {cards.length === 1 && <p className="text-sm text-ink">{cards[0].expression}</p>}
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setPuzzleIndex((prev) => prev + 1)}>New puzzle</Button>
-            <Button variant="ghost" size="sm" onClick={undoLast} disabled={history.length === 0}>Undo</Button>
-          </div>
+          <Button variant="ghost" size="sm" onClick={undoLast} disabled={history.length === 0}>
+            Undo
+          </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {cards.map((card) => (
             <button
               key={card.id}
               onClick={() => handleCardClick(card.id)}
-              className={`rounded-md border px-3 py-3 text-left text-ink ${selectedCard === card.id ? 'border-ink' : 'border-outline'} ${solved && cards[0].id === card.id ? 'bg-accentMuted' : 'bg-surface'}`}
+              className={`flex flex-col items-center justify-center rounded-2xl border-2 px-4 py-5 text-center transition-all duration-200 active:scale-[0.98] ${
+                selectedCard === card.id
+                  ? 'border-[rgb(var(--accent))] bg-[rgb(var(--accent-soft))] shadow-panel'
+                  : solved && cards[0].id === card.id
+                    ? 'border-emerald-400 bg-emerald-50 shadow-panel'
+                    : 'border-[rgb(var(--border))] bg-[rgb(var(--surface))] hover:border-[rgb(var(--accent))]/40 hover:shadow-panel'
+              }`}
             >
-              <p className="text-lg font-semibold">{card.label}</p>
-              <p className="text-xs text-muted">{card.expression}</p>
+              <p className="font-display text-2xl font-bold text-[rgb(var(--ink))] sm:text-3xl">{card.label}</p>
+              <p className="mt-1 font-mono text-xs text-[rgb(var(--ink-muted))]">{card.expression}</p>
             </button>
           ))}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {(['+', '-', '*', '/'] as Operator[]).map((op) => (
-            <Button key={op} variant={operator === op ? 'solid' : 'outline'} size="sm" onClick={() => {
-              if (!selectedCard) {
-                setMessage('Select a card first.');
-                return;
-              }
-              setOperator(op);
-              setMessage('Select another card to apply the operator.');
-            }}>
+            <Button
+              key={op}
+              variant={operator === op ? 'solid' : 'outline'}
+              size="sm"
+              onClick={() => {
+                if (!selectedCard) {
+                  setMessage('Select a card first.');
+                  return;
+                }
+                setOperator(op);
+                setMessage('Select another card to apply the operator.');
+              }}
+            >
               {op}
             </Button>
           ))}
         </div>
 
-        <p className="text-sm text-muted">{message}</p>
-        {solved && <p className="text-sm font-medium text-ink">Solved in {history.length + 1} steps.</p>}
+        <p className="text-sm text-[rgb(var(--ink-muted))]">{message}</p>
+        {solved && (
+          <p className="text-sm font-semibold text-emerald-600">
+            Solved in {history.length + 1} steps. {cards[0]?.expression}
+          </p>
+        )}
       </Card>
 
-      <Card className="space-y-3 border border-outline shadow-panel">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-ink">Hints</p>
-          <Button variant="outline" size="sm" onClick={() => setVisibleHints((prev) => Math.min(prev + 1, hints.length))} disabled={visibleHints >= hints.length}>
+      <Card className="space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="font-medium text-[rgb(var(--ink))]">Hints</p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setVisibleHints((prev) => Math.min(prev + 1, hints.length))}
+            disabled={visibleHints >= hints.length}
+          >
             Reveal hint
           </Button>
         </div>
-        {visibleHints === 0 && <p className="text-sm text-muted">No hints shown.</p>}
-        <ul className="space-y-2 text-sm text-ink">
+        {visibleHints === 0 && <p className="text-sm text-[rgb(var(--ink-muted))]">No hints shown.</p>}
+        <ul className="space-y-2 text-sm text-[rgb(var(--ink))]">
           {hints.slice(0, visibleHints).map((hint, index) => (
-            <li key={index}>
+            <li key={index} className="flex flex-wrap items-center gap-2">
               {hint.description}
-              {hint.expression && <span className="ml-2 font-mono text-xs text-muted">{hint.expression}</span>}
+              {hint.expression && (
+                <span className="font-mono text-xs text-[rgb(var(--ink-muted))]">{hint.expression}</span>
+              )}
             </li>
           ))}
         </ul>

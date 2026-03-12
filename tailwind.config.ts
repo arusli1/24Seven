@@ -5,23 +5,53 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        canvas: '#f9fafb',
-        surface: '#ffffff',
-        outline: '#d1d5db',
-        ink: '#0f172a',
-        muted: '#6b7280',
-        accent: '#4f46e5',
-        accentMuted: '#ede9fe'
+        canvas: 'rgb(var(--bg-base))',
+        surface: 'rgb(var(--surface))',
+        outline: 'rgb(var(--border))',
+        ink: 'rgb(var(--ink))',
+        muted: 'rgb(var(--ink-muted))',
+        accent: 'rgb(var(--accent))',
+        'accent-hover': 'rgb(var(--accent-hover))',
+        accentMuted: 'rgb(var(--accent-muted))',
+        'accent-soft': 'rgb(var(--accent-soft))',
       },
       fontFamily: {
-        sans: ['"IBM Plex Sans"', 'sans-serif']
+        sans: ['DM Sans', 'system-ui', 'sans-serif'],
+        display: ['Syne', 'sans-serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        panel: '0 2px 8px rgba(15, 23, 42, 0.08)'
-      }
-    }
+        panel: 'var(--shadow-md)',
+        'panel-lg': 'var(--shadow-lg)',
+        glow: 'var(--shadow-glow)',
+        'inner-soft': 'inset 0 2px 4px rgba(0,0,0,0.04)',
+      },
+      borderRadius: {
+        card: 'var(--radius-2xl)',
+        pill: '9999px',
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.4s ease-out',
+        'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        'scale-in': 'scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(12px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        scaleIn: {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+      },
+    },
   },
-  plugins: []
+  plugins: [],
 };
 
 export default config;

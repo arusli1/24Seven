@@ -19,39 +19,54 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function LeaderboardTabs() {
   const [active, setActive] = useState(60);
-  const { data, isLoading } = useSWR<Entry[]>(`/api/leaderboard?mode=speedrun&limit=50&timeLimit=${active}`, fetcher, {
-    refreshInterval: 30000
-  });
+  const { data, isLoading } = useSWR<Entry[]>(
+    `/api/leaderboard?mode=speedrun&limit=50&timeLimit=${active}`,
+    fetcher,
+    { refreshInterval: 30000 }
+  );
 
   return (
-    <Card>
-      <div className="flex flex-wrap gap-3">
+    <Card className="overflow-hidden">
+      <div className="flex flex-wrap gap-2">
         {TIME_LIMITS.map((limit) => (
           <button
             key={limit}
             onClick={() => setActive(limit)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${active === limit ? 'bg-accent text-white' : 'bg-slate-100 text-slate-600'}`}
+            className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
+              active === limit
+                ? 'bg-[rgb(var(--accent))] text-white shadow-panel'
+                : 'bg-[rgb(var(--bg-base))] text-[rgb(var(--ink-muted))] hover:bg-[rgb(var(--border))]/50'
+            }`}
           >
             {limit}s
           </button>
         ))}
       </div>
       <div className="mt-6">
-        {isLoading && <p className="text-sm text-slate-500">Loading…</p>}
+        {isLoading && <p className="text-sm text-[rgb(var(--ink-muted))]">Loading…</p>}
         {!isLoading && (
           <ol className="space-y-2">
             {data?.map((entry, index) => (
-              <li key={entry.id} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
+              <li
+                key={entry.id}
+                className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))]/40 bg-[rgb(var(--bg-base))]/60 px-4 py-3 transition-colors hover:bg-[rgb(var(--accent-soft))]/30"
+              >
                 <div>
-                  <p className="text-sm font-semibold text-slate-800">
+                  <p className="font-semibold text-[rgb(var(--ink))]">
                     #{index + 1} {entry.nickname}
                   </p>
-                  <p className="text-xs text-slate-500">Solved {entry.puzzlesSolved} • Avg {(entry.averageSolveMs / 1000).toFixed(2)}s</p>
+                  <p className="text-xs text-[rgb(var(--ink-muted))]">
+                    Solved {entry.puzzlesSolved} • Avg {(entry.averageSolveMs / 1000).toFixed(2)}s
+                  </p>
                 </div>
-                <span className="text-xs text-slate-500">{new Date(entry.createdAt).toLocaleDateString()}</span>
+                <span className="text-xs text-[rgb(var(--ink-subtle))]">
+                  {new Date(entry.createdAt).toLocaleDateString()}
+                </span>
               </li>
             ))}
-            {(!data || data.length === 0) && <p className="text-sm text-slate-500">No entries yet.</p>}
+            {(!data || data.length === 0) && (
+              <p className="py-8 text-center text-sm text-[rgb(var(--ink-muted))]">No entries yet.</p>
+            )}
           </ol>
         )}
       </div>
