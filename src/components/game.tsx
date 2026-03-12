@@ -115,38 +115,38 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
   }
 
   const cardStyle =
-    'game-card flex flex-col items-center justify-center rounded-3xl px-4 transition-all duration-200 ';
+    'game-card flex flex-col items-center justify-center rounded-2xl px-4 transition-all duration-200 ';
   const cardDefault =
-    'bg-zinc-800 text-white border-2 border-zinc-600 shadow-xl hover:bg-zinc-700 hover:border-zinc-500 active:scale-[0.98] ';
+    'bg-[#111] text-white border border-[#222] hover:bg-[#1a1a1a] hover:border-[#333] active:scale-[0.98] ';
   const cardSelected =
-    'bg-amber-500 text-black border-2 border-amber-400 shadow-2xl ring-4 ring-amber-400/40 ';
+    'bg-amber-500 text-black border-2 border-amber-400 shadow-xl ring-4 ring-amber-400/30 ';
   const cardSolved =
-    'bg-emerald-600 text-white border-2 border-emerald-400 shadow-2xl ';
+    'bg-emerald-600 text-white border-2 border-emerald-400 shadow-xl ';
 
   const opStyle =
-    'game-op flex items-center justify-center rounded-3xl font-bold transition-all duration-200 ';
+    'game-op flex items-center justify-center rounded-2xl font-bold transition-all duration-200 ';
   const opDefault =
-    'bg-zinc-800 text-zinc-200 border-2 border-zinc-600 shadow-xl hover:bg-zinc-700 hover:text-white hover:border-zinc-500 active:scale-[0.96] ';
+    'bg-[#111] text-zinc-400 border border-[#222] hover:bg-[#1a1a1a] hover:text-white hover:border-[#333] active:scale-[0.96] ';
   const opSelected =
-    'bg-amber-500 text-black border-2 border-amber-400 shadow-2xl ';
+    'bg-amber-500 text-black border-2 border-amber-400 shadow-xl ';
 
   const actionStyle =
-    'game-action rounded-3xl font-bold transition-all duration-200 ';
+    'game-action rounded-2xl font-bold transition-all duration-200 ';
   const actionDefault =
-    'bg-zinc-800 text-white border-2 border-zinc-600 shadow-xl hover:bg-zinc-700 hover:border-zinc-500 active:scale-[0.98] ';
+    'bg-[#111] text-white border border-[#222] hover:bg-[#1a1a1a] hover:border-[#333] active:scale-[0.98] ';
   const actionDisabled =
-    'opacity-50 cursor-not-allowed hover:bg-zinc-800 hover:border-zinc-600 ';
+    'opacity-50 cursor-not-allowed hover:bg-[#111] hover:border-[#222] ';
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="flex w-full flex-col items-center gap-10 sm:gap-12"
+      className="flex w-full flex-col items-center justify-center gap-12 sm:gap-14"
     >
-      {/* Numbers - centered grid */}
+      {/* Numbers - centered, generous spacing (speedto24 style) */}
       <section className="flex w-full flex-col items-center">
-        <div className="mb-4 flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+        <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8">
           <AnimatePresence mode="popLayout">
             {cards.map((c) => (
               <motion.button
@@ -181,20 +181,15 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
                     </span>
                   </span>
                 )}
-                {c.expr !== c.label && (
-                  <span className="mt-2 max-w-full break-words text-center font-mono text-[clamp(0.6rem,1.5vmin,0.9rem)] text-zinc-400">
-                    {c.expr}
-                  </span>
-                )}
               </motion.button>
             ))}
           </AnimatePresence>
         </div>
       </section>
 
-      {/* Operators - centered row */}
+      {/* Operators - centered row, consistent spacing */}
       <section className="flex w-full flex-col items-center">
-        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+        <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-6">
           {OPS.map(({ op: o, sym }) => (
             <motion.button
               key={o}
@@ -210,7 +205,7 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
 
       {/* Actions - centered row */}
       <section className="flex w-full flex-col items-center">
-        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+        <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-6">
           <motion.button
             onClick={loadNewPuzzle}
             whileTap={{ scale: 0.97 }}

@@ -15,25 +15,58 @@ body {
   font-family: 'DM Sans', system-ui, sans-serif;
   min-height: 100vh;
   min-height: 100dvh;
-  background: #050408;
+  background: #000;
 }
 
-/* Viewport-based game sizing - BIG and centered */
+/* 24-game-solver / speedto24 inspired: dark surfaces, generous spacing */
 .game-card {
-  min-height: clamp(160px, 35vmin, 320px);
-  min-width: clamp(160px, 35vmin, 320px);
+  min-height: 7rem;
+  min-width: 6rem;
+}
+@media (min-width: 640px) {
+  .game-card {
+    min-height: 8.5rem;
+    min-width: 7.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .game-card {
+    min-height: 10rem;
+    min-width: 9rem;
+  }
 }
 
 .game-op {
-  height: clamp(80px, 22vmin, 220px);
-  width: clamp(80px, 22vmin, 220px);
-  font-size: clamp(2rem, 6vmin, 4.5rem);
+  height: 4.5rem;
+  width: 4.5rem;
+  font-size: 1.75rem;
+}
+@media (min-width: 640px) {
+  .game-op {
+    height: 5.5rem;
+    width: 5.5rem;
+    font-size: 2.25rem;
+  }
+}
+@media (min-width: 1024px) {
+  .game-op {
+    height: 6.5rem;
+    width: 6.5rem;
+    font-size: 2.75rem;
+  }
 }
 
 .game-action {
-  min-height: clamp(60px, 14vmin, 120px);
-  padding: clamp(1rem, 4vmin, 2rem) clamp(2rem, 6vmin, 4rem);
-  font-size: clamp(1.125rem, 3vmin, 1.75rem);
+  min-height: 3.5rem;
+  padding: 0.875rem 2rem;
+  font-size: 1.125rem;
+}
+@media (min-width: 640px) {
+  .game-action {
+    min-height: 4rem;
+    padding: 1rem 2.5rem;
+    font-size: 1.25rem;
+  }
 }
 
 @layer base {
