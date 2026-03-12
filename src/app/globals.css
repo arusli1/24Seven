@@ -75,6 +75,105 @@ html, body {
   min-height: 0;
 }
 
+.game24-difficulty {
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+.game24-difficulty-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #71717a;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.game24-difficulty-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.game24-difficulty-min,
+.game24-difficulty-max {
+  font-size: 0.7rem;
+  color: #52525b;
+  min-width: 32px;
+}
+.game24-difficulty-max { text-align: right; }
+.game24-slider {
+  flex: 1;
+  height: 8px;
+  min-width: 0;
+  padding: 12px 0; /* expand touch target vertically */
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  touch-action: none;
+}
+.game24-slider::-webkit-slider-runnable-track {
+  height: 8px;
+  background: #27272a;
+  border-radius: 4px;
+}
+.game24-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  margin-top: -8px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.game24-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+.game24-slider::-moz-range-track {
+  height: 8px;
+  background: #27272a;
+  border-radius: 4px;
+}
+.game24-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: none;
+  cursor: pointer;
+}
+
+/* Larger thumb on touch devices for easier tap/drag */
+@media (hover: none) and (pointer: coarse) {
+  .game24-slider {
+    padding: 16px 0;
+  }
+  .game24-slider::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+    margin-top: -10px;
+  }
+  .game24-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.game24-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 16px;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  color: #71717a;
+  flex-shrink: 0;
+}
+.game24-solve-rate,
+.game24-session-stats {
+  margin: 0;
+}
+.game24-session-stats {
+  font-variant-numeric: tabular-nums;
+}
+
 .game24-actions {
   display: flex;
   justify-content: center;
@@ -112,6 +211,22 @@ html, body {
   color: white;
 }
 .game24-btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.game24-btn-nav {
+  padding: 10px 14px;
+  background: #27272a;
+  color: #a1a1aa;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1;
+}
+.game24-btn-nav:hover:not(:disabled) {
+  background: #3f3f46;
+  color: white;
+}
+.game24-btn-nav:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }

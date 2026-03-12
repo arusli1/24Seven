@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Puzzle } from '@/lib/types';
 import { Rational } from '@/lib/rational';
@@ -45,26 +45,71 @@ function combine(a: Rational, b: Rational, op: Operator): Rational {
   }
 }
 
+/** Pick puzzle with bias: 0 = prefer easy (high solve rate), 1 = prefer hard (low solve rate) */
+function pickWeightedPuzzle(puzzles: Puzzle[], bias: number, excludeIds: string[]): Puzzle {
+  let pool = puzzles.filter((p) => !excludeIds.includes(p.id));
+  if (pool.length === 0) return puzzles[Math.floor(Math.random() * puzzles.length)];
+  const sr = (p: Puzzle) => p.solveRate ?? 0.5;
+  // When bias is high, only allow low solve-rate puzzles (hard = actually hard)
+  const maxSolveRate = bias >= 0.8 ? 0.35 : bias >= 0.6 ? 0.5 : bias >= 0.4 ? 0.65 : 1;
+  const hardPool = pool.filter((p) => sr(p) <= maxSolveRate);
+  if (hardPool.length > 0) pool = hardPool;
+  const weights = pool.map((p) => (1 - bias) * sr(p) + bias * (1 - sr(p)));
+  const total = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < pool.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return pool[i];
+  }
+  return pool[pool.length - 1];
+}
+
+const MAX_PREV_HISTORY = 20;
+
 export function Game({ puzzles }: { puzzles: Puzzle[] }) {
   const [puzzle, setPuzzle] = useState<Puzzle | null>(null);
+  const [prevHistory, setPrevHistory] = useState<Puzzle[]>([]);
   const [recentIds, setRecentIds] = useState<string[]>([]);
   const [cards, setCards] = useState<CardState[]>([]);
   const [hist, setHist] = useState<CardState[][]>([]);
   const [sel, setSel] = useState<string | null>(null);
   const [op, setOp] = useState<Operator | null>(null);
   const [showSolution, setShowSolution] = useState(false);
+  const [difficultyBias, setDifficultyBias] = useState(0.5); // 0 = easy, 1 = hard
+  const [solvedCount, setSolvedCount] = useState(0);
+  const [sessionStart, setSessionStart] = useState<number | null>(null);
+  const [elapsedSec, setElapsedSec] = useState(0);
+  const peekedRef = useRef(false);
 
   const loadNewPuzzle = useCallback(() => {
     if (puzzles.length === 0) return;
-    const next = puzzles[Math.floor(Math.random() * puzzles.length)];
+    setPrevHistory((h) => (puzzle ? [...h.slice(-MAX_PREV_HISTORY + 1), puzzle] : h));
+    const next = pickWeightedPuzzle(puzzles, difficultyBias, recentIds);
     setPuzzle(next);
     setRecentIds((prev) => pushRecent(prev, next.id));
     setShowSolution(false);
-  }, [puzzles]);
+  }, [puzzles, difficultyBias, recentIds, puzzle]);
+
+  const goPrevPuzzle = useCallback(() => {
+    if (prevHistory.length === 0) return;
+    setPrevHistory((h) => h.slice(0, -1));
+    setPuzzle(prevHistory[prevHistory.length - 1]);
+    setShowSolution(false);
+  }, [prevHistory]);
 
   useEffect(() => {
     if (puzzles.length > 0 && !puzzle) loadNewPuzzle();
   }, [puzzles.length, puzzle, loadNewPuzzle]);
+
+  useEffect(() => {
+    if (puzzle && sessionStart === null) setSessionStart(Date.now());
+  }, [puzzle, sessionStart]);
+
+  useEffect(() => {
+    if (!sessionStart) return;
+    const t = setInterval(() => setElapsedSec(Math.floor((Date.now() - sessionStart) / 1000)), 1000);
+    return () => clearInterval(t);
+  }, [sessionStart]);
 
   useEffect(() => {
     if (!puzzle) return;
@@ -73,13 +118,20 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
     setSel(null);
     setOp(null);
     setShowSolution(false);
+    peekedRef.current = false;
   }, [puzzle]);
+
+  // Mark as peeked whenever solution is shown (reliable - runs after render)
+  useEffect(() => {
+    if (showSolution) peekedRef.current = true;
+  }, [showSolution]);
 
   const solved = cards.length === 1 && cards[0].value.equals(TARGET);
 
-  // Auto-load next puzzle when solved (speed game)
+  // Auto-load next puzzle when solved (only count if they didn't peek)
   useEffect(() => {
     if (!solved) return;
+    if (!peekedRef.current) setSolvedCount((c) => c + 1);
     const t = setTimeout(loadNewPuzzle, 500);
     return () => clearTimeout(t);
   }, [solved, loadNewPuzzle]);
@@ -132,9 +184,60 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
 
   return (
     <div className="game24-game-inner">
+      <div className="game24-difficulty">
+        <label htmlFor="difficulty-slider" className="game24-difficulty-label">
+          Difficulty
+        </label>
+        <div className="game24-difficulty-row">
+          <span className="game24-difficulty-min">Easy</span>
+          <input
+            id="difficulty-slider"
+            type="range"
+            min={0}
+            max={1}
+            step={0.1}
+            value={difficultyBias}
+            onChange={(e) => setDifficultyBias(Number(e.target.value))}
+            className="game24-slider"
+          />
+          <span className="game24-difficulty-max">Hard</span>
+        </div>
+      </div>
+      <div className="game24-stats">
+        {puzzle.solveRate != null && (
+          <span className="game24-solve-rate">
+            {(puzzle.solveRate * 100).toFixed(1)}% solve rate
+          </span>
+        )}
+        {(solvedCount > 0 || elapsedSec > 0) && (
+          <span className="game24-session-stats">
+            {solvedCount} solved
+            {elapsedSec > 0 && ` · ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`}
+          </span>
+        )}
+      </div>
       <div className="game24-actions">
-        <button onClick={loadNewPuzzle} className="game24-btn game24-btn-primary">
-          New Game
+        <button
+          onClick={goPrevPuzzle}
+          disabled={prevHistory.length === 0}
+          className="game24-btn game24-btn-nav"
+          title="Previous puzzle"
+        >
+          ‹
+        </button>
+        <button
+          onClick={loadNewPuzzle}
+          className="game24-btn game24-btn-primary"
+          title="Next puzzle"
+        >
+          ›
+        </button>
+        <button
+          onClick={() => setShowSolution((s) => !s)}
+          className="game24-btn game24-btn-secondary"
+          title={showSolution ? 'Hide solution' : 'Show solution (won\'t count as solve)'}
+        >
+          {showSolution ? 'Hide' : 'Solution'}
         </button>
         <button
           onClick={undo}
@@ -142,13 +245,6 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
           className="game24-btn game24-btn-secondary"
         >
           Undo
-        </button>
-        <button
-          onClick={() => setShowSolution((s) => !s)}
-          className="game24-btn game24-btn-secondary"
-          title={showSolution ? 'Hide solution' : 'Show solution'}
-        >
-          {showSolution ? 'Hide' : 'Solution'}
         </button>
       </div>
 
