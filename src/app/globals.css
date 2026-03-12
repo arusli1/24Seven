@@ -13,14 +13,15 @@
   --game24-bg: #0a0a0a;
   --game24-bg-card: #111111;
   --game24-border: rgba(255,255,255,0.08);
-  --game24-accent: #8B1538;
-  --game24-accent-hover: #A91D4A;
-  --game24-accent-glow: rgba(139,21,56,0.25);
+  --game24-accent: #dc2626;
+  --game24-accent-hover: #ef4444;
+  --game24-accent-glow: rgba(220,38,38,0.25);
   --game24-muted: #737373;
   --game24-muted-bg: #1a1a1a;
+  --game24-card-bg: #1f1518;
   --game24-success: #525252;
-  --game24-success-bg: rgba(139,21,56,0.15);
-  --game24-error: #8B1538;
+  --game24-success-bg: rgba(220,38,38,0.15);
+  --game24-error: #dc2626;
 }
 
 html, body {
@@ -31,7 +32,7 @@ html, body {
   overflow: hidden;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--game24-bg);
-  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139,21,56,0.08), transparent);
+  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(220,38,38,0.06), transparent);
   color: #fafafa;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -381,8 +382,8 @@ html, body {
   align-items: center;
   justify-content: center;
   border-radius: 16px;
-  border: 1px solid var(--game24-border);
-  background: var(--game24-muted-bg);
+  border: 1px solid rgba(220,38,38,0.4);
+  background: var(--game24-card-bg);
   color: white;
   font-size: clamp(2rem, 8vmin, 4rem);
   font-weight: 700;
@@ -392,13 +393,13 @@ html, body {
 }
 .game24-num-card:hover {
   background: #262626;
-  border-color: rgba(139,21,56,0.4);
+  border-color: rgba(220,38,38,0.4);
 }
 .game24-num-card:active {
   transform: scale(0.98);
 }
 .game24-num-card.selected {
-  background: rgba(139,21,56,0.18);
+  background: rgba(220,38,38,0.18);
   border-color: var(--game24-accent);
   box-shadow: 0 0 0 2px var(--game24-accent-glow);
 }
@@ -450,7 +451,7 @@ html, body {
 .game24-op:hover {
   background: #262626;
   color: var(--game24-accent-hover);
-  border-color: rgba(139,21,56,0.4);
+  border-color: rgba(220,38,38,0.4);
 }
 .game24-op:active {
   transform: scale(0.95);
