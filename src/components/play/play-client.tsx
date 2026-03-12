@@ -27,14 +27,16 @@ export function PlayClient({ puzzles }: Props) {
   const [visibleHints, setVisibleHints] = useState(0);
   const [puzzleIndex, setPuzzleIndex] = useState(0);
   const filtered = useMemo(() => (tierFilter === 'All' ? puzzles : puzzles.filter((puzzle) => puzzle.tier === tierFilter)), [puzzles, tierFilter]);
-  if (filtered.length === 0) {
-    return <p className="text-center text-sm text-red-500">No puzzles available for this tier. Run the importer.</p>;
-  }
-  const safeIndex = puzzleIndex % filtered.length;
-  const current = filtered[safeIndex];
-  const hints = useMemo(() => getHints(current.numbers).map((hint) => ({ description: hint.description, expression: hint.expression })), [current]);
+  const hasPuzzles = filtered.length > 0;
+  const safeIndex = hasPuzzles ? puzzleIndex % filtered.length : 0;
+  const current = hasPuzzles ? filtered[safeIndex] : null;
+  const hints = useMemo(
+    () => (current ? getHints(current.numbers).map((hint) => ({ description: hint.description, expression: hint.expression })) : []),
+    [current]
+  );
 
   useEffect(() => {
+    if (!current) return;
     setElapsedMs(0);
     const startedAt = Date.now();
     let raf: number | null = null;
@@ -51,12 +53,14 @@ export function PlayClient({ puzzles }: Props) {
   }, [current, timerEnabled]);
 
   useEffect(() => {
+    if (!current) return;
     setExpression('');
     setStatus({ type: 'idle', message: '' });
     setVisibleHints(0);
   }, [current]);
 
   const handleCheck = () => {
+    if (!current) return;
     const result = validateExpression(expression, current.numbers);
     if (result.ok) {
       setStatus({ type: 'success', message: 'Nice! That hits 24 exactly.' });
@@ -66,12 +70,17 @@ export function PlayClient({ puzzles }: Props) {
   };
 
   const nextPuzzle = () => {
+    if (!hasPuzzles) return;
     setPuzzleIndex(Math.floor(Math.random() * filtered.length));
   };
 
   const handleInsert = (value: string) => {
     setExpression((prev) => `${prev}${value}`);
   };
+
+  if (!current) {
+    return <p className="text-center text-sm text-red-500">No puzzles available for this tier. Run the importer.</p>;
+  }
 
   return (
     <div className="space-y-8">

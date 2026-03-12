@@ -16,14 +16,12 @@ interface Props {
 }
 
 export function SpeedrunClient({ puzzles }: Props) {
-  if (puzzles.length === 0) {
-    return <p className="text-sm text-red-500">No puzzles available. Import difficulties first.</p>;
-  }
+  const hasPuzzles = puzzles.length > 0;
   const [timeLimit, setTimeLimit] = useState(60);
   const [running, setRunning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(timeLimit * 1000);
   const [expression, setExpression] = useState('');
-  const [currentPuzzle, setCurrentPuzzle] = useState(() => puzzles[0]);
+  const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(() => (hasPuzzles ? puzzles[0] : null));
   const [totalAttempts, setTotalAttempts] = useState(0);
   const [invalidAttempts, setInvalidAttempts] = useState(0);
   const [puzzlesSolved, setPuzzlesSolved] = useState(0);
@@ -55,9 +53,13 @@ export function SpeedrunClient({ puzzles }: Props) {
   }, [running, timeLimit]);
 
   useEffect(() => {
+    if (!hasPuzzles) {
+      setCurrentPuzzle(null);
+      return;
+    }
     const random = puzzles[Math.floor(Math.random() * puzzles.length)];
     setCurrentPuzzle(random);
-  }, [puzzles]);
+  }, [puzzles, hasPuzzles]);
 
   const startRun = () => {
     setRunning(true);
@@ -72,6 +74,10 @@ export function SpeedrunClient({ puzzles }: Props) {
   };
 
   const nextPuzzle = () => {
+    if (!hasPuzzles) {
+      setCurrentPuzzle(null);
+      return;
+    }
     const random = puzzles[Math.floor(Math.random() * puzzles.length)];
     setCurrentPuzzle(random);
     setExpression('');
@@ -83,6 +89,10 @@ export function SpeedrunClient({ puzzles }: Props) {
       return;
     }
     setTotalAttempts((prev) => prev + 1);
+    if (!currentPuzzle) {
+      setStatus('No puzzles available. Import difficulties first.');
+      return;
+    }
     const result = validateExpression(expression, currentPuzzle.numbers);
     if (result.ok) {
       setPuzzlesSolved((prev) => prev + 1);
@@ -138,6 +148,10 @@ export function SpeedrunClient({ puzzles }: Props) {
       setSaving(false);
     }
   };
+
+  if (!currentPuzzle) {
+    return <p className="text-sm text-red-500">No puzzles available. Import difficulties first.</p>;
+  }
 
   return (
     <div className="space-y-6">
