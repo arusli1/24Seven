@@ -174,7 +174,7 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
   };
 
   if (!puzzle) {
-    return <p style={{ textAlign: 'center', color: '#71717a', fontSize: '0.875rem' }}>No puzzles.</p>;
+    return <p className="game24-empty">No puzzles.</p>;
   }
 
   return (

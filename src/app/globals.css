@@ -2,11 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 * {
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
+}
+
+:root {
+  --game24-bg: #0c0c0e;
+  --game24-bg-card: #141416;
+  --game24-border: rgba(255,255,255,0.06);
+  --game24-accent: #22d3ee;
+  --game24-accent-dim: #0891b2;
+  --game24-accent-glow: rgba(34,211,238,0.15);
+  --game24-muted: #71717a;
+  --game24-muted-bg: #1f1f23;
+  --game24-success: #34d399;
+  --game24-success-bg: rgba(52,211,153,0.12);
+  --game24-error: #f87171;
 }
 
 html, body {
@@ -15,8 +29,9 @@ html, body {
   height: 100%;
   min-height: 100dvh;
   overflow: hidden;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0a0a0b;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--game24-bg);
+  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34,211,238,0.08), transparent);
   color: #fafafa;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -30,7 +45,7 @@ html, body {
   align-items: center;
   justify-content: center;
   height: 100dvh;
-  padding: 12px 16px;
+  padding: 16px 20px;
   overflow: hidden;
 }
 
@@ -45,11 +60,11 @@ html, body {
 }
 
 .game24-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  color: #60a5fa;
-  margin: 0 0 12px 0;
+  font-size: 1.625rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--game24-accent);
+  margin: 0 0 16px 0;
   text-align: center;
   flex-shrink: 0;
 }
@@ -60,10 +75,42 @@ html, body {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: #111113;
-  border-radius: 16px;
-  padding: 16px 20px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  background: var(--game24-bg-card);
+  border-radius: 20px;
+  padding: 20px 24px;
+  border: 1px solid var(--game24-border);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.game24-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 4px;
+  background: var(--game24-muted-bg);
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+.game24-tab {
+  flex: 1;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--game24-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.game24-tab:hover {
+  color: #d4d4d8;
+}
+.game24-tab.active {
+  background: var(--game24-accent);
+  color: #0c0c0e;
+  box-shadow: 0 2px 8px var(--game24-accent-glow);
 }
 
 .game24-game-inner {
@@ -74,85 +121,168 @@ html, body {
   flex: 1;
   min-height: 0;
 }
+.game24-empty {
+  text-align: center;
+  color: var(--game24-muted);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Solver mode */
+.game24-solver-desc {
+  font-size: 0.8rem;
+  color: var(--game24-muted);
+  margin: 0 0 14px 0;
+  text-align: center;
+  flex-shrink: 0;
+}
+.game24-solver-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+.game24-solver-input {
+  width: 100%;
+  padding: 18px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 14px;
+  border: 1px solid var(--game24-border);
+  background: var(--game24-muted-bg);
+  color: white;
+  font-family: inherit;
+  -moz-appearance: textfield;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.game24-solver-input::-webkit-outer-spin-button,
+.game24-solver-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.game24-solver-input:focus {
+  outline: none;
+  border-color: var(--game24-accent);
+  box-shadow: 0 0 0 3px var(--game24-accent-glow);
+}
+.game24-solver-btn {
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+.game24-solver-output {
+  width: 100%;
+  flex: 1;
+  min-height: 80px;
+  padding: 16px 18px;
+  background: var(--game24-muted-bg);
+  border-radius: 14px;
+  border: 1px solid var(--game24-border);
+  overflow-y: auto;
+  flex-shrink: 1;
+}
+.game24-solver-placeholder {
+  font-size: 0.875rem;
+  color: var(--game24-muted);
+  opacity: 0.8;
+}
+.game24-solver-none {
+  font-size: 0.9375rem;
+  color: var(--game24-error);
+}
+.game24-solver-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.9rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  color: #a1a1aa;
+  line-height: 1.7;
+}
+.game24-solver-list li {
+  margin-bottom: 6px;
+  word-break: break-all;
+}
 
 .game24-difficulty {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   flex-shrink: 0;
 }
 .game24-difficulty-label {
   display: block;
   font-size: 0.75rem;
-  color: #71717a;
-  margin-bottom: 6px;
+  color: var(--game24-muted);
+  margin-bottom: 8px;
   text-align: center;
+  font-weight: 500;
 }
 .game24-difficulty-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 .game24-difficulty-min,
 .game24-difficulty-max {
   font-size: 0.7rem;
-  color: #52525b;
+  color: var(--game24-muted);
   min-width: 32px;
+  font-weight: 500;
 }
 .game24-difficulty-max { text-align: right; }
 .game24-slider {
   flex: 1;
-  height: 8px;
+  height: 6px;
   min-width: 0;
-  padding: 12px 0; /* expand touch target vertically */
+  padding: 12px 0;
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
   touch-action: none;
 }
 .game24-slider::-webkit-slider-runnable-track {
-  height: 8px;
-  background: #27272a;
-  border-radius: 4px;
+  height: 6px;
+  background: var(--game24-muted-bg);
+  border-radius: 3px;
 }
 .game24-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   margin-top: -8px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: var(--game24-accent);
   cursor: pointer;
-  transition: transform 0.15s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 .game24-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
+  box-shadow: 0 0 12px var(--game24-accent-glow);
 }
 .game24-slider::-moz-range-track {
-  height: 8px;
-  background: #27272a;
-  border-radius: 4px;
+  height: 6px;
+  background: var(--game24-muted-bg);
+  border-radius: 3px;
 }
 .game24-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: var(--game24-accent);
   border: none;
   cursor: pointer;
 }
 
-/* Larger thumb on touch devices for easier tap/drag */
 @media (hover: none) and (pointer: coarse) {
-  .game24-slider {
-    padding: 16px 0;
-  }
+  .game24-slider { padding: 16px 0; }
   .game24-slider::-webkit-slider-thumb {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     margin-top: -10px;
   }
   .game24-slider::-moz-range-thumb {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
   }
 }
 
@@ -160,55 +290,56 @@ html, body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px 16px;
-  margin-bottom: 8px;
+  gap: 10px 18px;
+  margin-bottom: 10px;
   font-size: 0.75rem;
-  color: #71717a;
+  color: var(--game24-muted);
   flex-shrink: 0;
 }
 .game24-solve-rate,
-.game24-session-stats {
-  margin: 0;
-}
+.game24-session-stats { margin: 0; }
 .game24-timer {
   font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
 .game24-actions {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 14px;
   flex-shrink: 0;
 }
 
 .game24-btn {
-  padding: 10px 20px;
-  font-size: 0.9375rem;
+  padding: 10px 18px;
+  font-size: 0.9rem;
   font-weight: 600;
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: transform 0.15s, background 0.2s;
+  transition: all 0.2s ease;
   font-family: inherit;
 }
 .game24-btn:active { transform: scale(0.97); }
 
 .game24-btn-primary {
-  background: #3b82f6;
-  color: white;
+  background: var(--game24-accent);
+  color: #0c0c0e;
 }
 .game24-btn-primary:hover {
-  background: #2563eb;
+  background: #67e8f9;
+  box-shadow: 0 4px 16px var(--game24-accent-glow);
 }
 
 .game24-btn-secondary {
-  background: #27272a;
+  background: var(--game24-muted-bg);
   color: #a1a1aa;
+  border: 1px solid var(--game24-border);
 }
 .game24-btn-secondary:hover:not(:disabled) {
-  background: #3f3f46;
-  color: white;
+  background: #27272a;
+  color: #e4e4e7;
 }
 .game24-btn-secondary:disabled {
   opacity: 0.4;
@@ -216,28 +347,29 @@ html, body {
 }
 .game24-btn-nav {
   padding: 10px 14px;
-  background: #27272a;
+  background: var(--game24-muted-bg);
   color: #a1a1aa;
   font-size: 1.1rem;
   font-weight: 600;
   line-height: 1;
+  border: 1px solid var(--game24-border);
 }
 .game24-btn-nav:hover:not(:disabled) {
-  background: #3f3f46;
-  color: white;
+  background: #27272a;
+  color: #e4e4e7;
 }
 .game24-btn-nav:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
-/* 2x2 number grid - fills available space, no scroll */
+/* 2x2 number grid */
 .game24-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 14px;
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -249,29 +381,31 @@ html, body {
   align-items: center;
   justify-content: center;
   border-radius: 16px;
-  border: 2px solid #3b82f6;
-  background: #1e3a5f;
+  border: 1px solid var(--game24-border);
+  background: var(--game24-muted-bg);
   color: white;
   font-size: clamp(2rem, 8vmin, 4rem);
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s, transform 0.15s, border-color 0.2s;
+  transition: all 0.2s ease;
   font-family: inherit;
 }
 .game24-num-card:hover {
-  background: #2563eb;
+  background: #27272a;
+  border-color: rgba(34,211,238,0.3);
 }
 .game24-num-card:active {
   transform: scale(0.98);
 }
 .game24-num-card.selected {
-  background: #60a5fa;
-  border-color: #93c5fd;
-  box-shadow: 0 0 0 3px rgba(96,165,250,0.3);
+  background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(8,145,178,0.15));
+  border-color: var(--game24-accent);
+  box-shadow: 0 0 0 2px var(--game24-accent-glow);
 }
 .game24-num-card.solved {
-  background: #059669;
-  border-color: #34d399;
+  background: var(--game24-success-bg);
+  border-color: var(--game24-success);
+  color: var(--game24-success);
 }
 
 .game24-fraction {
@@ -303,54 +437,56 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  border: none;
-  background: #27272a;
-  color: #a1a1aa;
+  border-radius: 14px;
+  border: 1px solid var(--game24-border);
+  background: var(--game24-muted-bg);
+  color: var(--game24-muted);
   font-size: 1.5rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, transform 0.15s;
+  transition: all 0.2s ease;
   font-family: inherit;
 }
 .game24-op:hover {
-  background: #3b82f6;
-  color: white;
+  background: #27272a;
+  color: var(--game24-accent);
+  border-color: rgba(34,211,238,0.3);
 }
 .game24-op:active {
   transform: scale(0.95);
 }
 .game24-op.selected {
-  background: #3b82f6;
-  color: white;
+  background: var(--game24-accent);
+  color: #0c0c0e;
+  border-color: var(--game24-accent);
 }
 
 .game24-success {
   text-align: center;
   font-size: 1rem;
   font-weight: 600;
-  color: #34d399;
+  color: var(--game24-success);
   flex-shrink: 0;
 }
 
 .game24-solution {
-  margin: 0 0 12px 0;
-  padding: 12px 16px;
-  background: #1e293b;
-  border-radius: 10px;
+  margin: 0 0 14px 0;
+  padding: 14px 18px;
+  background: var(--game24-muted-bg);
+  border-radius: 12px;
+  border: 1px solid var(--game24-border);
   font-size: 0.9rem;
   font-family: ui-monospace, monospace;
-  color: #94a3b8;
+  color: #a1a1aa;
   word-break: break-all;
   flex-shrink: 0;
 }
 
 @media (min-width: 480px) {
-  .game24-grid {
-    gap: 14px;
-  }
+  .game24-grid { gap: 14px; }
   .game24-op {
     width: 56px;
     height: 56px;
+    border-radius: 16px;
   }
 }

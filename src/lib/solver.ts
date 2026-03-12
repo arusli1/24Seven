@@ -27,6 +27,45 @@ export function solvePuzzle(numbers: number[]): SolverResult | null {
   return result;
 }
 
+/** Find all distinct solutions for the given 4 numbers. */
+export function findAllSolutions(numbers: number[]): string[] {
+  if (numbers.length !== 4) return [];
+  const rationals = numbers.map((n) => Rational.fromInteger(n));
+  const exprs = numbers.map((n) => n.toString());
+  const seen = new Set<string>();
+  searchAll(rationals, exprs, seen);
+  return [...seen];
+}
+
+function searchAll(values: Rational[], exprs: string[], out: Set<string>): void {
+  if (values.length === 1) {
+    if (values[0].equals(TARGET)) {
+      out.add(exprs[0]);
+    }
+    return;
+  }
+  for (let i = 0; i < values.length; i += 1) {
+    for (let j = 0; j < values.length; j += 1) {
+      if (i === j) continue;
+      const remainingVals: Rational[] = [];
+      const remainingExprs: string[] = [];
+      for (let k = 0; k < values.length; k += 1) {
+        if (k !== i && k !== j) {
+          remainingVals.push(values[k]);
+          remainingExprs.push(exprs[k]);
+        }
+      }
+      const a = values[i];
+      const b = values[j];
+      const exprA = exprs[i];
+      const exprB = exprs[j];
+      for (const combo of combine(a, exprA, b, exprB)) {
+        searchAll([...remainingVals, combo.value], [...remainingExprs, combo.expr], out);
+      }
+    }
+  }
+}
+
 function toKey(values: Rational[]) {
   return values
     .map((value) => `${value.numerator}/${value.denominator}`)

@@ -1,4 +1,4 @@
-import { Game } from '@/components/game';
+import { ModeSwitcher } from '@/components/mode-switcher';
 import { loadPuzzles } from '@/lib/difficulty';
 
 export default function HomePage() {
@@ -8,7 +8,7 @@ export default function HomePage() {
       <div className="game24-container">
         <h1 className="game24-title">24 Game</h1>
         <section className="game24-card">
-          <Game puzzles={puzzles} />
+          <ModeSwitcher puzzles={puzzles} />
         </section>
       </div>
     </main>
