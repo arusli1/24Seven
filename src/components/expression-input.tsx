@@ -36,7 +36,7 @@ export function ExpressionInput({ value, onChange, onCheck, onClear, onBackspace
       />
       <div className="flex flex-wrap gap-3">
         <Button onClick={onCheck}>Check</Button>
-        <Button variant="secondary" onClick={onClear}>
+        <Button variant="outline" onClick={onClear}>
           Clear
         </Button>
         <Button variant="ghost" onClick={onBackspace}>

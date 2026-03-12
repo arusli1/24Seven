@@ -4,18 +4,20 @@ const config: Config = {
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
-      fontFamily: {
-        display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
-        sans: ['"Inter"', 'system-ui', 'sans-serif']
-      },
       colors: {
-        accent: {
-          DEFAULT: '#2563eb',
-          soft: '#dbeafe'
-        }
+        canvas: '#f9fafb',
+        surface: '#ffffff',
+        outline: '#d1d5db',
+        ink: '#0f172a',
+        muted: '#6b7280',
+        accent: '#4f46e5',
+        accentMuted: '#ede9fe'
+      },
+      fontFamily: {
+        sans: ['"IBM Plex Sans"', 'sans-serif']
       },
       boxShadow: {
-        card: '0 20px 40px rgba(15, 23, 42, 0.12)'
+        panel: '0 2px 8px rgba(15, 23, 42, 0.08)'
       }
     }
   },

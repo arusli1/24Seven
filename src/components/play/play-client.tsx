@@ -2,138 +2,205 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Puzzle, DifficultyTier } from '@/lib/types';
-import { validateExpression } from '@/lib/validate';
-import { getHints } from '@/lib/solver';
-import { PuzzleCards } from '@/components/puzzle-cards';
-import { ExpressionInput } from '@/components/expression-input';
+import { getHints, solvePuzzle } from '@/lib/solver';
+import { Rational } from '@/lib/rational';
 import { Button } from '@/components/ui/button';
-import { Keypad } from '@/components/keypad';
-import { HintPanel } from '@/components/hint-panel';
-import { Toggle } from '@/components/ui/toggle';
+import { Card } from '@/components/ui/card';
 
 interface Props {
   puzzles: Puzzle[];
 }
 
+type Operator = '+' | '-' | '*' | '/';
+
+interface CardState {
+  id: string;
+  value: Rational;
+  label: string;
+  expression: string;
+}
+
 const tiers: (DifficultyTier | 'All')[] = ['All', 'Easy', 'Medium', 'Hard', 'Expert'];
+const TARGET = new Rational(24, 1);
+
+function createCards(numbers: number[]): CardState[] {
+  return numbers.map((num, index) => ({
+    id: `${num}-${index}-${Math.random().toString(16).slice(2)}`,
+    value: Rational.fromInteger(num),
+    label: num.toString(),
+    expression: num.toString()
+  }));
+}
+
+function combineValues(a: Rational, b: Rational, operator: Operator) {
+  switch (operator) {
+    case '+':
+      return a.add(b);
+    case '-':
+      return a.sub(b);
+    case '*':
+      return a.mul(b);
+    case '/':
+      return a.div(b);
+    default:
+      return a;
+  }
+}
 
 export function PlayClient({ puzzles }: Props) {
   const [tierFilter, setTierFilter] = useState<(typeof tiers)[number]>('All');
-  const [showTier, setShowTier] = useState(true);
-  const [timerEnabled, setTimerEnabled] = useState(false);
-  const [elapsedMs, setElapsedMs] = useState(0);
-  const [expression, setExpression] = useState('');
-  const [status, setStatus] = useState<{ type: 'idle' | 'success' | 'error'; message: string }>({ type: 'idle', message: '' });
-  const [visibleHints, setVisibleHints] = useState(0);
   const [puzzleIndex, setPuzzleIndex] = useState(0);
+  const [cards, setCards] = useState<CardState[]>([]);
+  const [history, setHistory] = useState<CardState[][]>([]);
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [operator, setOperator] = useState<Operator | null>(null);
+  const [message, setMessage] = useState('Select a card to start.');
+  const [visibleHints, setVisibleHints] = useState(0);
+
   const filtered = useMemo(() => (tierFilter === 'All' ? puzzles : puzzles.filter((puzzle) => puzzle.tier === tierFilter)), [puzzles, tierFilter]);
   const hasPuzzles = filtered.length > 0;
-  const safeIndex = hasPuzzles ? puzzleIndex % filtered.length : 0;
-  const current = hasPuzzles ? filtered[safeIndex] : null;
-  const hints = useMemo(
-    () => (current ? getHints(current.numbers).map((hint) => ({ description: hint.description, expression: hint.expression })) : []),
-    [current]
-  );
+  const currentPuzzle = hasPuzzles ? filtered[puzzleIndex % filtered.length] : null;
 
   useEffect(() => {
-    if (!current) return;
-    setElapsedMs(0);
-    const startedAt = Date.now();
-    let raf: number | null = null;
-    if (timerEnabled) {
-      const tick = () => {
-        setElapsedMs(Date.now() - startedAt);
-        raf = requestAnimationFrame(tick);
-      };
-      raf = requestAnimationFrame(tick);
-    }
-    return () => {
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [current, timerEnabled]);
-
-  useEffect(() => {
-    if (!current) return;
-    setExpression('');
-    setStatus({ type: 'idle', message: '' });
+    if (!currentPuzzle) return;
+    setCards(createCards(currentPuzzle.numbers));
+    setHistory([]);
+    setSelectedCard(null);
+    setOperator(null);
+    setMessage('Select a card to start.');
     setVisibleHints(0);
-  }, [current]);
+  }, [currentPuzzle]);
 
-  const handleCheck = () => {
-    if (!current) return;
-    const result = validateExpression(expression, current.numbers);
-    if (result.ok) {
-      setStatus({ type: 'success', message: 'Nice! That hits 24 exactly.' });
-    } else {
-      setStatus({ type: 'error', message: result.reason });
+  const hints = useMemo(() => (currentPuzzle ? getHints(currentPuzzle.numbers) : []), [currentPuzzle]);
+  const solved = cards.length === 1 && cards[0].value.equals(TARGET);
+
+  const handleCardClick = (id: string) => {
+    if (!operator) {
+      setSelectedCard(id);
+      setMessage('Pick an operator.');
+      return;
+    }
+    if (!selectedCard || selectedCard === id) {
+      setSelectedCard(id);
+      return;
+    }
+    combineCards(selectedCard, id, operator);
+  };
+
+  const combineCards = (firstId: string, secondId: string, op: Operator) => {
+    const first = cards.find((card) => card.id === firstId);
+    const second = cards.find((card) => card.id === secondId);
+    if (!first || !second) return;
+
+    try {
+      const resultValue = combineValues(first.value, second.value, op);
+      const nextCards = cards.filter((card) => card.id !== firstId && card.id !== secondId);
+      const newCard: CardState = {
+        id: `${Date.now()}`,
+        value: resultValue,
+        label: resultValue.toString(),
+        expression: `(${first.expression} ${op} ${second.expression})`
+      };
+      setHistory((prev) => [...prev, cards]);
+      setCards([...nextCards, newCard]);
+      setSelectedCard(null);
+      setOperator(null);
+      setMessage(cards.length === 2 && resultValue.equals(TARGET) ? 'That makes 24!' : 'Select the next card.');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Invalid move.');
+      setOperator(null);
+      setSelectedCard(null);
     }
   };
 
-  const nextPuzzle = () => {
-    if (!hasPuzzles) return;
-    setPuzzleIndex(Math.floor(Math.random() * filtered.length));
+  const undoLast = () => {
+    setHistory((prev) => {
+      if (prev.length === 0) return prev;
+      const copy = [...prev];
+      const last = copy.pop()!;
+      setCards(last);
+      setSelectedCard(null);
+      setOperator(null);
+      setMessage('Move undone.');
+      return copy;
+    });
   };
 
-  const handleInsert = (value: string) => {
-    setExpression((prev) => `${prev}${value}`);
-  };
-
-  if (!current) {
-    return <p className="text-center text-sm text-red-500">No puzzles available for this tier. Run the importer.</p>;
+  if (!currentPuzzle) {
+    return <p className="text-sm text-red-600">No puzzles available. Run the importer.</p>;
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap gap-4">
+    <div className="space-y-6">
+      <div className="flex flex-wrap gap-2">
         {tiers.map((tier) => (
-          <button
-            key={tier}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${tierFilter === tier ? 'bg-accent text-white' : 'bg-slate-100 text-slate-600'}`}
-            onClick={() => setTierFilter(tier)}
-          >
+          <Button key={tier} variant={tierFilter === tier ? 'solid' : 'outline'} size="sm" onClick={() => setTierFilter(tier)}>
             {tier}
-          </button>
+          </Button>
         ))}
       </div>
-      <div className="flex flex-wrap items-center gap-6">
-        <Toggle label="Show difficulty tag" checked={showTier} onChange={setShowTier} />
-        <Toggle label="Timer" checked={timerEnabled} onChange={setTimerEnabled} />
-        {timerEnabled && <span className="rounded-full bg-slate-900 px-3 py-1 text-sm font-mono text-white">{(elapsedMs / 1000).toFixed(1)}s</span>}
-      </div>
-      <PuzzleCards numbers={current.numbers} tier={current.tier} showTier={showTier} />
-      <div className="flex flex-wrap gap-4">
-        <Button variant="secondary" onClick={() => setVisibleHints((prev) => Math.min(prev + 1, hints.length))}>
-          Give hint
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => {
-            if (window.confirm('Reveal the full solution?')) {
-              setVisibleHints(hints.length);
-            }
-          }}
-        >
-          Show solution
-        </Button>
-        <Button onClick={nextPuzzle}>
-          New puzzle
-        </Button>
-      </div>
-      <ExpressionInput
-        value={expression}
-        onChange={setExpression}
-        onBackspace={() => setExpression((prev) => prev.slice(0, -1))}
-        onClear={() => setExpression('')}
-        onCheck={handleCheck}
-      />
-      <p className={status.type === 'success' ? 'text-emerald-600' : status.type === 'error' ? 'text-rose-600' : 'text-slate-500'}>
-        {status.message || 'waiting for your attempt…'}
-      </p>
-      <HintPanel hints={hints} visibleHints={visibleHints} onReveal={() => setVisibleHints((prev) => Math.min(prev + 1, hints.length))} />
-      <div className="rounded-3xl bg-white/80 p-4 shadow-card">
-        <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Quick keypad</p>
-        <Keypad onInsert={handleInsert} />
-      </div>
+
+      <Card className="space-y-4 border border-outline shadow-panel">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-muted">{currentPuzzle.tier} • {currentPuzzle.difficulty}</p>
+            {cards.length === 1 && <p className="text-sm text-ink">{cards[0].expression}</p>}
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setPuzzleIndex((prev) => prev + 1)}>New puzzle</Button>
+            <Button variant="ghost" size="sm" onClick={undoLast} disabled={history.length === 0}>Undo</Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {cards.map((card) => (
+            <button
+              key={card.id}
+              onClick={() => handleCardClick(card.id)}
+              className={`rounded-md border px-3 py-3 text-left text-ink ${selectedCard === card.id ? 'border-ink' : 'border-outline'} ${solved && cards[0].id === card.id ? 'bg-accentMuted' : 'bg-surface'}`}
+            >
+              <p className="text-lg font-semibold">{card.label}</p>
+              <p className="text-xs text-muted">{card.expression}</p>
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-2">
+          {(['+', '-', '*', '/'] as Operator[]).map((op) => (
+            <Button key={op} variant={operator === op ? 'solid' : 'outline'} size="sm" onClick={() => {
+              if (!selectedCard) {
+                setMessage('Select a card first.');
+                return;
+              }
+              setOperator(op);
+              setMessage('Select another card to apply the operator.');
+            }}>
+              {op}
+            </Button>
+          ))}
+        </div>
+
+        <p className="text-sm text-muted">{message}</p>
+        {solved && <p className="text-sm font-medium text-ink">Solved in {history.length + 1} steps.</p>}
+      </Card>
+
+      <Card className="space-y-3 border border-outline shadow-panel">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-medium text-ink">Hints</p>
+          <Button variant="outline" size="sm" onClick={() => setVisibleHints((prev) => Math.min(prev + 1, hints.length))} disabled={visibleHints >= hints.length}>
+            Reveal hint
+          </Button>
+        </div>
+        {visibleHints === 0 && <p className="text-sm text-muted">No hints shown.</p>}
+        <ul className="space-y-2 text-sm text-ink">
+          {hints.slice(0, visibleHints).map((hint, index) => (
+            <li key={index}>
+              {hint.description}
+              {hint.expression && <span className="ml-2 font-mono text-xs text-muted">{hint.expression}</span>}
+            </li>
+          ))}
+        </ul>
+      </Card>
     </div>
   );
 }

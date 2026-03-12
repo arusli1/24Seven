@@ -15,7 +15,7 @@ export function HintPanel({ hints, visibleHints, onReveal }: HintPanelProps) {
     <div className="space-y-3 rounded-3xl border border-slate-200 bg-white/80 p-4">
       <div className="flex items-center justify-between">
         <h4 className="font-semibold text-slate-800">Hints</h4>
-        <Button variant="secondary" size="md" onClick={onReveal} disabled={visibleHints >= hints.length}>
+        <Button variant="outline" size="md" onClick={onReveal} disabled={visibleHints >= hints.length}>
           Reveal next
         </Button>
       </div>
