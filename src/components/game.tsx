@@ -100,7 +100,7 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
   };
 
   if (!puzzle) {
-    return <p className="text-muted-foreground text-sm">No puzzles.</p>;
+    return <p className="text-zinc-400 text-sm">No puzzles.</p>;
   }
 
   return (
@@ -108,10 +108,13 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="flex w-full max-w-2xl flex-col items-center justify-center gap-10 sm:gap-14"
+      className="flex w-full flex-col items-center gap-8 sm:gap-10"
     >
-      {/* Numbers */}
-      <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8">
+      <section className="w-full">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-500 sm:text-base">
+          Your numbers
+        </h2>
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
         <AnimatePresence mode="popLayout">
           {cards.map((c) => (
             <motion.button
@@ -123,42 +126,46 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
               onClick={() => onCard(c.id)}
               className={
-                'flex min-h-[5.5rem] min-w-[4.5rem] flex-col items-center justify-center rounded-2xl px-2 transition-colors duration-200 sm:min-h-[6.5rem] sm:min-w-[5.5rem] md:min-h-[7rem] md:min-w-[6rem] ' +
+                'flex min-h-[5.5rem] min-w-[4.5rem] flex-col items-center justify-center rounded-xl border px-2 transition-colors duration-200 sm:min-h-[6.5rem] sm:min-w-[5.5rem] md:min-h-[7rem] md:min-w-[6rem] ' +
                 (sel === c.id
-                  ? 'scale-105 border-2 border-primary bg-primary/15 shadow-lg'
+                  ? 'scale-105 border-2 border-cyan-400 bg-cyan-500/20 shadow-lg'
                   : solved && cards[0].id === c.id
-                    ? 'border-2 border-emerald-500/50 bg-emerald-500/15 shadow-lg'
-                    : 'border border-border/50 bg-card/40 hover:border-border hover:bg-card/60' + (sel ? ' hover:border-primary/50' : ''))
+                    ? 'border-2 border-emerald-500/60 bg-emerald-500/20 shadow-lg'
+                    : 'border-zinc-600 bg-zinc-800/80 text-white hover:border-zinc-500 hover:bg-zinc-700/80' + (sel ? ' hover:border-cyan-400/50' : ''))
               }
               whileTap={{ scale: 0.97 }}
             >
               {c.value.denominator === 1 ? (
-                <span className="text-4xl font-semibold tabular-nums text-foreground sm:text-5xl md:text-6xl">
+                <span className="text-4xl font-semibold tabular-nums sm:text-5xl md:text-6xl">
                   {c.value.numerator}
                 </span>
               ) : (
                 <span className="flex flex-col items-center leading-tight">
-                  <span className="text-2xl font-semibold tabular-nums text-foreground sm:text-3xl md:text-4xl">
+                  <span className="text-2xl font-semibold tabular-nums sm:text-3xl md:text-4xl">
                     {c.value.numerator}
                   </span>
-                  <span className="my-0.5 w-full border-t-2 border-foreground/80" />
-                  <span className="text-2xl font-semibold tabular-nums text-foreground sm:text-3xl md:text-4xl">
+                  <span className="my-0.5 w-full border-t-2 border-white/80" />
+                  <span className="text-2xl font-semibold tabular-nums sm:text-3xl md:text-4xl">
                     {c.value.denominator}
                   </span>
                 </span>
               )}
               {c.expr !== c.label && (
-                <span className="mt-1.5 font-mono text-[10px] text-muted-foreground sm:text-xs">
+                <span className="mt-1.5 font-mono text-[10px] text-zinc-400 sm:text-xs">
                   {c.expr}
                 </span>
               )}
             </motion.button>
           ))}
         </AnimatePresence>
-      </div>
+        </div>
+      </section>
 
-      {/* Operators */}
-      <div className="flex gap-4 sm:gap-6">
+      <section className="w-full">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-500 sm:text-base">
+          Operators
+        </h2>
+        <div className="flex justify-center gap-4 sm:gap-6">
         {OPS.map(({ op: o, sym }) => (
           <motion.button
             key={o}
@@ -166,21 +173,25 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
             whileTap={{ scale: 0.92 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             className={
-              'flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-medium transition-colors duration-200 sm:h-20 sm:w-20 sm:text-3xl md:h-24 md:w-24 md:text-4xl ' +
-              (op === o ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground')
+              'flex h-16 w-16 items-center justify-center rounded-xl border text-2xl font-medium transition-colors duration-200 sm:h-20 sm:w-20 sm:text-3xl md:h-24 md:w-24 md:text-4xl ' +
+              (op === o ? 'border-cyan-400 bg-cyan-500 text-white shadow-lg' : 'border-zinc-600 bg-zinc-800/80 text-zinc-400 hover:border-zinc-500 hover:text-white')
             }
           >
             {sym}
           </motion.button>
         ))}
-      </div>
+        </div>
+      </section>
 
-      {/* Actions */}
-      <div className="flex gap-6">
+      <section className="w-full">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-500 sm:text-base">
+          Actions
+        </h2>
+        <div className="flex justify-center gap-4 sm:gap-6">
         <motion.button
           onClick={() => setIdx((i) => i + 1)}
           whileTap={{ scale: 0.95 }}
-          className="rounded-2xl border border-border/50 bg-transparent px-8 py-4 text-base font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground sm:text-lg"
+          className="rounded-xl border border-zinc-600 bg-zinc-800/80 px-8 py-4 text-base font-medium text-white transition-colors hover:border-zinc-500 hover:bg-zinc-700/80 sm:text-lg"
         >
           New
         </motion.button>
@@ -188,11 +199,12 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
           onClick={undo}
           disabled={hist.length === 0}
           whileTap={hist.length > 0 ? { scale: 0.95 } : {}}
-          className="rounded-2xl border border-border/50 bg-transparent px-8 py-4 text-base font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground disabled:opacity-40 disabled:hover:border-border/50 disabled:hover:text-muted-foreground sm:text-lg"
+          className="rounded-xl border border-zinc-600 bg-zinc-800/80 px-8 py-4 text-base font-medium text-white transition-colors hover:border-zinc-500 hover:bg-zinc-700/80 disabled:opacity-40 disabled:hover:border-zinc-600 disabled:hover:bg-zinc-800/80 sm:text-lg"
         >
           Undo
         </motion.button>
-      </div>
+        </div>
+      </section>
 
       <AnimatePresence>
         {solved && (
@@ -201,7 +213,7 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="text-lg font-medium text-emerald-500 sm:text-xl"
+            className="text-lg font-medium text-emerald-400 sm:text-xl"
           >
             {hist.length + 1} steps
           </motion.p>
