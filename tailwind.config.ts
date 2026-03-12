@@ -16,8 +16,8 @@ const config: Config = {
         'accent-soft': 'rgb(var(--accent-soft))',
       },
       fontFamily: {
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
-        display: ['Syne', 'system-ui', 'sans-serif'],
+        sans: ['Outfit', 'system-ui', 'sans-serif'],
+        display: ['Outfit', 'system-ui', 'sans-serif'],
         mono: ['ui-monospace', 'monospace'],
       },
       boxShadow: {

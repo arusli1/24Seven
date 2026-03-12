@@ -1,105 +1,241 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 * {
   -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-  font-size: clamp(18px, 4vw, 24px);
-}
-
-body {
-  font-family: 'DM Sans', system-ui, sans-serif;
-  min-height: 100vh;
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
   min-height: 100dvh;
-  background: #000;
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0a0a0b;
+  color: #fafafa;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* 24-game-solver / speedto24 inspired: dark surfaces, generous spacing */
-.game-card {
-  min-height: 7rem;
-  min-width: 6rem;
-}
-@media (min-width: 640px) {
-  .game-card {
-    min-height: 8.5rem;
-    min-width: 7.5rem;
-  }
-}
-@media (min-width: 1024px) {
-  .game-card {
-    min-height: 10rem;
-    min-width: 9rem;
-  }
+/* ========== 24 GAME - No scroll, fits viewport ========== */
+
+.game24-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+  padding: 12px 16px;
+  overflow: hidden;
 }
 
-.game-op {
-  height: 4.5rem;
-  width: 4.5rem;
-  font-size: 1.75rem;
-}
-@media (min-width: 640px) {
-  .game-op {
-    height: 5.5rem;
-    width: 5.5rem;
-    font-size: 2.25rem;
-  }
-}
-@media (min-width: 1024px) {
-  .game-op {
-    height: 6.5rem;
-    width: 6.5rem;
-    font-size: 2.75rem;
-  }
+.game24-container {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
 }
 
-.game-action {
-  min-height: 3.5rem;
-  padding: 0.875rem 2rem;
-  font-size: 1.125rem;
-}
-@media (min-width: 640px) {
-  .game-action {
-    min-height: 4rem;
-    padding: 1rem 2.5rem;
-    font-size: 1.25rem;
-  }
+.game24-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #60a5fa;
+  margin: 0 0 12px 0;
+  text-align: center;
+  flex-shrink: 0;
 }
 
-@layer base {
-  :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(0.98 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.55 0.2 250);
-    --primary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.96 0 0);
-    --muted-foreground: oklch(0.5 0 0);
-    --border: oklch(0.9 0 0);
-    --destructive: oklch(0.55 0.2 25);
-    --ring: oklch(0.55 0.2 250);
+.game24-card {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #111113;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.game24-game-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.game24-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.game24-btn {
+  padding: 10px 20px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.2s;
+  font-family: inherit;
+}
+.game24-btn:active { transform: scale(0.97); }
+
+.game24-btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+.game24-btn-primary:hover {
+  background: #2563eb;
+}
+
+.game24-btn-secondary {
+  background: #27272a;
+  color: #a1a1aa;
+}
+.game24-btn-secondary:hover:not(:disabled) {
+  background: #3f3f46;
+  color: white;
+}
+.game24-btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 2x2 number grid - fills available space, no scroll */
+.game24-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.game24-num-card {
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  border: 2px solid #3b82f6;
+  background: #1e3a5f;
+  color: white;
+  font-size: clamp(2rem, 8vmin, 4rem);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, border-color 0.2s;
+  font-family: inherit;
+}
+.game24-num-card:hover {
+  background: #2563eb;
+}
+.game24-num-card:active {
+  transform: scale(0.98);
+}
+.game24-num-card.selected {
+  background: #60a5fa;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(96,165,250,0.3);
+}
+.game24-num-card.solved {
+  background: #059669;
+  border-color: #34d399;
+}
+
+.game24-fraction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.5em;
+  line-height: 1.2;
+}
+.game24-fraction-bar {
+  width: 100%;
+  border-bottom: 2px solid currentColor;
+  margin: 4px 0;
+  opacity: 0.9;
+}
+
+/* Operator row */
+.game24-ops {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.game24-op {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: #27272a;
+  color: #a1a1aa;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+  font-family: inherit;
+}
+.game24-op:hover {
+  background: #3b82f6;
+  color: white;
+}
+.game24-op:active {
+  transform: scale(0.95);
+}
+.game24-op.selected {
+  background: #3b82f6;
+  color: white;
+}
+
+.game24-success {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #34d399;
+  flex-shrink: 0;
+}
+
+.game24-solution {
+  margin: 0 0 12px 0;
+  padding: 12px 16px;
+  background: #1e293b;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: ui-monospace, monospace;
+  color: #94a3b8;
+  word-break: break-all;
+  flex-shrink: 0;
+}
+
+@media (min-width: 480px) {
+  .game24-grid {
+    gap: 14px;
   }
-  .dark {
-    --background: oklch(0.08 0.005 260);
-    --foreground: oklch(0.95 0 0);
-    --card: oklch(0.12 0.005 260);
-    --card-foreground: oklch(0.95 0 0);
-    --primary: oklch(0.7 0.12 195);
-    --primary-foreground: oklch(0.12 0 0);
-    --muted: oklch(0.18 0.01 260);
-    --muted-foreground: oklch(0.6 0 0);
-    --border: oklch(0.22 0.01 260);
-    --destructive: oklch(0.6 0.2 25);
-    --ring: oklch(0.7 0.12 195);
-  }
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
+  .game24-op {
+    width: 56px;
+    height: 56px;
   }
 }

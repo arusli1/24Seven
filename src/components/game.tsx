@@ -4,7 +4,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Puzzle } from '@/lib/types';
 import { Rational } from '@/lib/rational';
-import { selectNextPuzzle, pushRecent } from '@/lib/puzzle-select';
+import { pushRecent } from '@/lib/puzzle-select';
+import { solvePuzzle } from '@/lib/solver';
 
 type Operator = '+' | '-' | '*' | '/';
 
@@ -51,13 +52,15 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
   const [hist, setHist] = useState<CardState[][]>([]);
   const [sel, setSel] = useState<string | null>(null);
   const [op, setOp] = useState<Operator | null>(null);
+  const [showSolution, setShowSolution] = useState(false);
 
   const loadNewPuzzle = useCallback(() => {
     if (puzzles.length === 0) return;
-    const next = selectNextPuzzle(puzzles, recentIds, 2);
+    const next = puzzles[Math.floor(Math.random() * puzzles.length)];
     setPuzzle(next);
     setRecentIds((prev) => pushRecent(prev, next.id));
-  }, [puzzles, recentIds]);
+    setShowSolution(false);
+  }, [puzzles]);
 
   useEffect(() => {
     if (puzzles.length > 0 && !puzzle) loadNewPuzzle();
@@ -69,9 +72,21 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
     setHist([]);
     setSel(null);
     setOp(null);
+    setShowSolution(false);
   }, [puzzle]);
 
   const solved = cards.length === 1 && cards[0].value.equals(TARGET);
+
+  // Auto-load next puzzle when solved (speed game)
+  useEffect(() => {
+    if (!solved) return;
+    const t = setTimeout(loadNewPuzzle, 500);
+    return () => clearTimeout(t);
+  }, [solved, loadNewPuzzle]);
+
+  const solutionExpr = puzzle
+    ? (puzzle.solutions?.[0] ?? solvePuzzle(puzzle.numbers)?.expression)
+    : null;
 
   const onCard = (id: string) => {
     if (!op) {
@@ -87,13 +102,14 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
     try {
       const v = combine(a.value, b.value, op);
       setHist((h) => [...h, cards]);
-      setCards(cards.filter((c) => c.id !== sel && c.id !== id).concat({
+      const newCard = {
         id: `${Date.now()}`,
         value: v,
         label: v.toString(),
         expr: `(${a.expr} ${OP_SYM[op]} ${b.expr})`,
-      }));
-      setSel(null);
+      };
+      setCards(cards.filter((c) => c.id !== sel && c.id !== id).concat(newCard));
+      setSel(newCard.id);
       setOp(null);
     } catch {
       setOp(null);
@@ -111,137 +127,80 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
   };
 
   if (!puzzle) {
-    return <p className="text-zinc-400 text-sm">No puzzles.</p>;
+    return <p style={{ textAlign: 'center', color: '#71717a', fontSize: '0.875rem' }}>No puzzles.</p>;
   }
 
-  const cardStyle =
-    'game-card flex flex-col items-center justify-center rounded-2xl px-4 transition-all duration-200 ';
-  const cardDefault =
-    'bg-[#111] text-white border border-[#222] hover:bg-[#1a1a1a] hover:border-[#333] active:scale-[0.98] ';
-  const cardSelected =
-    'bg-amber-500 text-black border-2 border-amber-400 shadow-xl ring-4 ring-amber-400/30 ';
-  const cardSolved =
-    'bg-emerald-600 text-white border-2 border-emerald-400 shadow-xl ';
-
-  const opStyle =
-    'game-op flex items-center justify-center rounded-2xl font-bold transition-all duration-200 ';
-  const opDefault =
-    'bg-[#111] text-zinc-400 border border-[#222] hover:bg-[#1a1a1a] hover:text-white hover:border-[#333] active:scale-[0.96] ';
-  const opSelected =
-    'bg-amber-500 text-black border-2 border-amber-400 shadow-xl ';
-
-  const actionStyle =
-    'game-action rounded-2xl font-bold transition-all duration-200 ';
-  const actionDefault =
-    'bg-[#111] text-white border border-[#222] hover:bg-[#1a1a1a] hover:border-[#333] active:scale-[0.98] ';
-  const actionDisabled =
-    'opacity-50 cursor-not-allowed hover:bg-[#111] hover:border-[#222] ';
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="flex w-full flex-col items-center justify-center gap-12 sm:gap-14"
-    >
-      {/* Numbers - centered, generous spacing (speedto24 style) */}
-      <section className="flex w-full flex-col items-center">
-        <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8">
-          <AnimatePresence mode="popLayout">
-            {cards.map((c) => (
-              <motion.button
-                key={c.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                onClick={() => onCard(c.id)}
-                className={
-                  cardStyle +
-                  (sel === c.id
-                    ? cardSelected
-                    : solved && cards[0].id === c.id
-                      ? cardSolved
-                      : cardDefault + (sel ? ' hover:border-amber-500/60' : ''))
-                }
-              >
-                {c.value.denominator === 1 ? (
-                  <span className="font-display text-[clamp(2.5rem,8vmin,5rem)] font-bold tabular-nums">
-                    {c.value.numerator}
-                  </span>
-                ) : (
-                  <span className="flex flex-col items-center">
-                    <span className="font-display text-[clamp(2rem,6vmin,4rem)] font-bold tabular-nums">
-                      {c.value.numerator}
-                    </span>
-                    <span className="my-1 w-full border-b-2 border-current opacity-80" />
-                    <span className="font-display text-[clamp(2rem,6vmin,4rem)] font-bold tabular-nums">
-                      {c.value.denominator}
-                    </span>
-                  </span>
-                )}
-              </motion.button>
-            ))}
-          </AnimatePresence>
-        </div>
-      </section>
+    <div className="game24-game-inner">
+      <div className="game24-actions">
+        <button onClick={loadNewPuzzle} className="game24-btn game24-btn-primary">
+          New Game
+        </button>
+        <button
+          onClick={undo}
+          disabled={hist.length === 0}
+          className="game24-btn game24-btn-secondary"
+        >
+          Undo
+        </button>
+        <button
+          onClick={() => setShowSolution((s) => !s)}
+          className="game24-btn game24-btn-secondary"
+          title={showSolution ? 'Hide solution' : 'Show solution'}
+        >
+          {showSolution ? 'Hide' : 'Solution'}
+        </button>
+      </div>
 
-      {/* Operators - centered row, consistent spacing */}
-      <section className="flex w-full flex-col items-center">
-        <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-6">
-          {OPS.map(({ op: o, sym }) => (
+      {showSolution && solutionExpr && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="game24-solution"
+        >
+          {solutionExpr.replace(/\*/g, '×').replace(/\//g, '÷')}
+        </motion.p>
+      )}
+
+      <div className="game24-grid">
+        <AnimatePresence mode="popLayout">
+          {cards.map((c) => (
             <motion.button
-              key={o}
-              onClick={() => sel && setOp(o)}
-              whileTap={{ scale: 0.95 }}
-              className={opStyle + (op === o ? opSelected : opDefault)}
+              key={c.id}
+              layout
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+              onClick={() => onCard(c.id)}
+              className={`game24-num-card ${sel === c.id ? 'selected' : ''} ${solved && cards[0].id === c.id ? 'solved' : ''}`}
             >
-              {sym}
+              {c.value.denominator === 1 ? (
+                <span style={{ fontVariantNumeric: 'tabular-nums' }}>{c.value.numerator}</span>
+              ) : (
+                <span className="game24-fraction">
+                  <span style={{ fontVariantNumeric: 'tabular-nums' }}>{c.value.numerator}</span>
+                  <span className="game24-fraction-bar" />
+                  <span style={{ fontVariantNumeric: 'tabular-nums' }}>{c.value.denominator}</span>
+                </span>
+              )}
             </motion.button>
           ))}
-        </div>
-      </section>
+        </AnimatePresence>
+      </div>
 
-      {/* Actions - centered row */}
-      <section className="flex w-full flex-col items-center">
-        <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-6">
-          <motion.button
-            onClick={loadNewPuzzle}
-            whileTap={{ scale: 0.97 }}
-            className={actionStyle + actionDefault}
+      <div className="game24-ops">
+        {OPS.map(({ op: o, sym }) => (
+          <button
+            key={o}
+            onClick={() => sel && setOp(o)}
+            className={`game24-op ${op === o ? 'selected' : ''}`}
           >
-            New
-          </motion.button>
-          <motion.button
-            onClick={undo}
-            disabled={hist.length === 0}
-            whileTap={hist.length > 0 ? { scale: 0.97 } : {}}
-            className={
-              actionStyle +
-              (hist.length === 0 ? actionDisabled : actionDefault)
-            }
-          >
-            Undo
-          </motion.button>
-        </div>
-      </section>
+            {sym}
+          </button>
+        ))}
+      </div>
 
-      <AnimatePresence>
-        {solved && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="rounded-3xl bg-emerald-600 px-10 py-5 shadow-xl"
-          >
-            <p className="font-display text-2xl font-bold text-white">
-              {hist.length + 1} steps
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }
