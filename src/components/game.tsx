@@ -243,6 +243,7 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
+          transition={{ duration: 0.15 }}
           className="game24-solution"
         >
           {solutionExpr.replace(/\*/g, '×').replace(/\//g, '÷')}
@@ -255,10 +256,10 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
             <motion.button
               key={c.id}
               layout
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 28 }}
               onClick={() => onCard(c.id)}
               className={`game24-num-card ${sel === c.id ? 'selected' : ''} ${solved && cards[0].id === c.id ? 'solved' : ''}`}
             >

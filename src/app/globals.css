@@ -19,8 +19,9 @@
   --game24-muted: #737373;
   --game24-muted-bg: #1a1a1a;
   --game24-card-bg: #1f1518;
-  --game24-success: #525252;
-  --game24-success-bg: rgba(220,38,38,0.15);
+  --game24-success: #22c55e;
+  --game24-success-bg: rgba(34,197,94,0.2);
+  --game24-success-glow: rgba(34,197,94,0.3);
   --game24-error: #dc2626;
 }
 
@@ -102,7 +103,7 @@ html, body {
   background: transparent;
   color: var(--game24-muted);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease-out;
   font-family: inherit;
 }
 .game24-tab:hover {
@@ -157,7 +158,7 @@ html, body {
   color: white;
   font-family: inherit;
   -moz-appearance: textfield;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out;
 }
 .game24-solver-input::-webkit-outer-spin-button,
 .game24-solver-input::-webkit-inner-spin-button {
@@ -254,10 +255,10 @@ html, body {
   border-radius: 50%;
   background: var(--game24-accent);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
 }
 .game24-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.08);
+  transform: scale(1.05);
   box-shadow: 0 0 12px var(--game24-accent-glow);
 }
 .game24-slider::-moz-range-track {
@@ -319,10 +320,10 @@ html, body {
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.12s ease-out;
   font-family: inherit;
 }
-.game24-btn:active { transform: scale(0.97); }
+.game24-btn:active { transform: scale(0.98); }
 
 .game24-btn-primary {
   background: var(--game24-accent);
@@ -388,7 +389,7 @@ html, body {
   font-size: clamp(2rem, 8vmin, 4rem);
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease-out;
   font-family: inherit;
 }
 .game24-num-card:hover {
@@ -396,7 +397,7 @@ html, body {
   border-color: rgba(220,38,38,0.4);
 }
 .game24-num-card:active {
-  transform: scale(0.98);
+  transform: scale(0.99);
 }
 .game24-num-card.selected {
   background: rgba(220,38,38,0.18);
@@ -405,7 +406,8 @@ html, body {
 }
 .game24-num-card.solved {
   background: var(--game24-success-bg);
-  border-color: var(--game24-accent);
+  border-color: var(--game24-success);
+  box-shadow: 0 0 0 2px var(--game24-success-glow);
   color: #fafafa;
 }
 
@@ -445,7 +447,7 @@ html, body {
   font-size: 1.5rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease-out;
   font-family: inherit;
 }
 .game24-op:hover {
@@ -454,7 +456,7 @@ html, body {
   border-color: rgba(220,38,38,0.4);
 }
 .game24-op:active {
-  transform: scale(0.95);
+  transform: scale(0.97);
 }
 .game24-op.selected {
   background: var(--game24-accent);
