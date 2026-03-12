@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Puzzle } from '@/lib/types';
 import { Rational } from '@/lib/rational';
 
@@ -12,6 +13,8 @@ const OPS: { op: Operator; sym: string }[] = [
   { op: '*', sym: '×' },
   { op: '/', sym: '÷' },
 ];
+
+const OP_SYM: Record<Operator, string> = { '+': '+', '-': '−', '*': '×', '/': '÷' };
 
 interface CardState {
   id: string;
@@ -77,7 +80,7 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
         id: `${Date.now()}`,
         value: v,
         label: v.toString(),
-        expr: `(${a.expr} ${op} ${b.expr})`,
+        expr: `(${a.expr} ${OP_SYM[op]} ${b.expr})`,
       }));
       setSel(null);
       setOp(null);
@@ -101,72 +104,109 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
   }
 
   return (
-    <div className="flex w-full max-w-sm flex-col items-center gap-8 sm:max-w-md">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="flex w-full max-w-2xl flex-col items-center justify-center gap-10 sm:gap-14"
+    >
       {/* Numbers */}
-      <div className="flex flex-wrap justify-center gap-4">
-        {cards.map((c) => (
-          <button
-            key={c.id}
-            onClick={() => onCard(c.id)}
-            className={
-              'flex h-20 w-16 flex-col items-center justify-center rounded-2xl transition-all duration-200 ease-out active:scale-[0.98] sm:h-24 sm:w-20 ' +
-              (sel === c.id
-                ? 'scale-105 border-2 border-primary bg-primary/10'
-                : solved && cards[0].id === c.id
-                  ? 'border-2 border-emerald-500/50 bg-emerald-500/10'
-                  : 'border border-border/50 bg-card/30 hover:border-border hover:bg-card/50' + (sel ? ' hover:border-primary/40' : ''))
-            }
-          >
-            <span className="text-3xl font-semibold tabular-nums text-foreground sm:text-4xl">
-              {c.label}
-            </span>
-            {c.expr !== c.label && (
-              <span className="mt-0.5 font-mono text-[10px] text-muted-foreground sm:text-xs">
-                {c.expr}
-              </span>
-            )}
-          </button>
-        ))}
+      <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8">
+        <AnimatePresence mode="popLayout">
+          {cards.map((c) => (
+            <motion.button
+              key={c.id}
+              layout
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              onClick={() => onCard(c.id)}
+              className={
+                'flex min-h-[5.5rem] min-w-[4.5rem] flex-col items-center justify-center rounded-2xl px-2 transition-colors duration-200 sm:min-h-[6.5rem] sm:min-w-[5.5rem] md:min-h-[7rem] md:min-w-[6rem] ' +
+                (sel === c.id
+                  ? 'scale-105 border-2 border-primary bg-primary/15 shadow-lg'
+                  : solved && cards[0].id === c.id
+                    ? 'border-2 border-emerald-500/50 bg-emerald-500/15 shadow-lg'
+                    : 'border border-border/50 bg-card/40 hover:border-border hover:bg-card/60' + (sel ? ' hover:border-primary/50' : ''))
+              }
+              whileTap={{ scale: 0.97 }}
+            >
+              {c.value.denominator === 1 ? (
+                <span className="text-4xl font-semibold tabular-nums text-foreground sm:text-5xl md:text-6xl">
+                  {c.value.numerator}
+                </span>
+              ) : (
+                <span className="flex flex-col items-center leading-tight">
+                  <span className="text-2xl font-semibold tabular-nums text-foreground sm:text-3xl md:text-4xl">
+                    {c.value.numerator}
+                  </span>
+                  <span className="my-0.5 w-full border-t-2 border-foreground/80" />
+                  <span className="text-2xl font-semibold tabular-nums text-foreground sm:text-3xl md:text-4xl">
+                    {c.value.denominator}
+                  </span>
+                </span>
+              )}
+              {c.expr !== c.label && (
+                <span className="mt-1.5 font-mono text-[10px] text-muted-foreground sm:text-xs">
+                  {c.expr}
+                </span>
+              )}
+            </motion.button>
+          ))}
+        </AnimatePresence>
       </div>
 
       {/* Operators */}
-      <div className="flex gap-3">
+      <div className="flex gap-4 sm:gap-6">
         {OPS.map(({ op: o, sym }) => (
-          <button
+          <motion.button
             key={o}
             onClick={() => sel && setOp(o)}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             className={
-              'h-12 w-12 rounded-xl text-xl font-medium transition-all duration-200 active:scale-95 sm:h-14 sm:w-14 sm:text-2xl ' +
-              (op === o ? 'bg-primary text-primary-foreground' : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground')
+              'flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-medium transition-colors duration-200 sm:h-20 sm:w-20 sm:text-3xl md:h-24 md:w-24 md:text-4xl ' +
+              (op === o ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground')
             }
           >
             {sym}
-          </button>
+          </motion.button>
         ))}
       </div>
 
       {/* Actions */}
-      <div className="flex gap-4">
-        <button
+      <div className="flex gap-6">
+        <motion.button
           onClick={() => setIdx((i) => i + 1)}
-          className="rounded-xl border border-border/50 bg-transparent px-5 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:border-border hover:text-foreground active:scale-95"
+          whileTap={{ scale: 0.95 }}
+          className="rounded-2xl border border-border/50 bg-transparent px-8 py-4 text-base font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground sm:text-lg"
         >
           New
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           onClick={undo}
           disabled={hist.length === 0}
-          className="rounded-xl border border-border/50 bg-transparent px-5 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:border-border hover:text-foreground active:scale-95 disabled:opacity-40 disabled:active:scale-100"
+          whileTap={hist.length > 0 ? { scale: 0.95 } : {}}
+          className="rounded-2xl border border-border/50 bg-transparent px-8 py-4 text-base font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground disabled:opacity-40 disabled:hover:border-border/50 disabled:hover:text-muted-foreground sm:text-lg"
         >
           Undo
-        </button>
+        </motion.button>
       </div>
 
-      {solved && (
-        <p className="text-sm text-emerald-500 transition-opacity duration-300">
-          {hist.length + 1} steps
-        </p>
-      )}
-    </div>
+      <AnimatePresence>
+        {solved && (
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-lg font-medium text-emerald-500 sm:text-xl"
+          >
+            {hist.length + 1} steps
+          </motion.p>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
