@@ -8,7 +8,7 @@
 
 html {
   scroll-behavior: smooth;
-  font-size: clamp(16px, 2.5vw, 22px);
+  font-size: clamp(18px, 4vw, 24px);
 }
 
 body {
@@ -16,6 +16,24 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   background: #050408;
+}
+
+/* Viewport-based game sizing - BIG and centered */
+.game-card {
+  min-height: clamp(160px, 35vmin, 320px);
+  min-width: clamp(160px, 35vmin, 320px);
+}
+
+.game-op {
+  height: clamp(80px, 22vmin, 220px);
+  width: clamp(80px, 22vmin, 220px);
+  font-size: clamp(2rem, 6vmin, 4.5rem);
+}
+
+.game-action {
+  min-height: clamp(60px, 14vmin, 120px);
+  padding: clamp(1rem, 4vmin, 2rem) clamp(2rem, 6vmin, 4rem);
+  font-size: clamp(1.125rem, 3vmin, 1.75rem);
 }
 
 @layer base {

@@ -114,26 +114,26 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
     return <p className="text-zinc-400 text-sm">No puzzles.</p>;
   }
 
-  const cardBase =
-    'flex flex-col items-center justify-center rounded-2xl px-4 transition-all duration-200 ';
+  const cardStyle =
+    'game-card flex flex-col items-center justify-center rounded-3xl px-4 transition-all duration-200 ';
   const cardDefault =
-    'bg-zinc-800 text-white border-2 border-zinc-600 shadow-lg shadow-black/30 hover:bg-zinc-700 hover:border-zinc-500 active:scale-[0.98] ';
+    'bg-zinc-800 text-white border-2 border-zinc-600 shadow-xl hover:bg-zinc-700 hover:border-zinc-500 active:scale-[0.98] ';
   const cardSelected =
-    'bg-amber-500 text-black border-2 border-amber-400 shadow-xl shadow-amber-500/25 ring-4 ring-amber-400/30 ';
+    'bg-amber-500 text-black border-2 border-amber-400 shadow-2xl ring-4 ring-amber-400/40 ';
   const cardSolved =
-    'bg-emerald-600 text-white border-2 border-emerald-400 shadow-xl shadow-emerald-500/30 ';
+    'bg-emerald-600 text-white border-2 border-emerald-400 shadow-2xl ';
 
-  const opBase =
-    'flex items-center justify-center rounded-2xl font-semibold transition-all duration-200 ';
+  const opStyle =
+    'game-op flex items-center justify-center rounded-3xl font-bold transition-all duration-200 ';
   const opDefault =
-    'bg-zinc-800 text-zinc-300 border-2 border-zinc-600 shadow-lg shadow-black/30 hover:bg-zinc-700 hover:text-white hover:border-zinc-500 active:scale-[0.96] ';
+    'bg-zinc-800 text-zinc-200 border-2 border-zinc-600 shadow-xl hover:bg-zinc-700 hover:text-white hover:border-zinc-500 active:scale-[0.96] ';
   const opSelected =
-    'bg-amber-500 text-black border-2 border-amber-400 shadow-xl shadow-amber-500/25 ';
+    'bg-amber-500 text-black border-2 border-amber-400 shadow-2xl ';
 
-  const actionBase =
-    'rounded-2xl px-10 py-5 text-xl font-semibold transition-all duration-200 ';
+  const actionStyle =
+    'game-action rounded-3xl font-bold transition-all duration-200 ';
   const actionDefault =
-    'bg-zinc-800 text-white border-2 border-zinc-600 shadow-lg shadow-black/30 hover:bg-zinc-700 hover:border-zinc-500 active:scale-[0.98] ';
+    'bg-zinc-800 text-white border-2 border-zinc-600 shadow-xl hover:bg-zinc-700 hover:border-zinc-500 active:scale-[0.98] ';
   const actionDisabled =
     'opacity-50 cursor-not-allowed hover:bg-zinc-800 hover:border-zinc-600 ';
 
@@ -142,15 +142,13 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="flex w-full flex-col items-center gap-8 sm:gap-10 md:gap-12"
+      className="flex w-full flex-col items-center gap-10 sm:gap-12"
     >
-      <section className="w-full">
-        <h2 className="mb-4 text-center text-sm font-medium uppercase tracking-widest text-zinc-500 sm:text-base">
-          Your numbers
-        </h2>
-        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8">
+      {/* Numbers - centered grid */}
+      <section className="flex w-full flex-col items-center">
+        <div className="mb-4 flex flex-wrap items-center justify-center gap-4 sm:gap-6">
           <AnimatePresence mode="popLayout">
-            {cards.map((c, i) => (
+            {cards.map((c) => (
               <motion.button
                 key={c.id}
                 layout
@@ -160,32 +158,31 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
                 transition={{ type: 'spring', stiffness: 350, damping: 25 }}
                 onClick={() => onCard(c.id)}
                 className={
-                  cardBase +
+                  cardStyle +
                   (sel === c.id
                     ? cardSelected
                     : solved && cards[0].id === c.id
                       ? cardSolved
-                      : cardDefault + (sel ? ' hover:border-amber-500/60' : '')) +
-                  ' min-h-[7rem] min-w-[6rem] sm:min-h-[8.5rem] sm:min-w-[7.5rem] md:min-h-[10rem] md:min-w-[9rem] lg:min-h-[11rem] lg:min-w-[10rem]'
+                      : cardDefault + (sel ? ' hover:border-amber-500/60' : ''))
                 }
               >
                 {c.value.denominator === 1 ? (
-                  <span className="font-display text-4xl font-bold tabular-nums sm:text-5xl md:text-6xl lg:text-7xl">
+                  <span className="font-display text-[clamp(2.5rem,8vmin,5rem)] font-bold tabular-nums">
                     {c.value.numerator}
                   </span>
                 ) : (
                   <span className="flex flex-col items-center">
-                    <span className="font-display text-3xl font-bold tabular-nums sm:text-4xl md:text-5xl">
+                    <span className="font-display text-[clamp(2rem,6vmin,4rem)] font-bold tabular-nums">
                       {c.value.numerator}
                     </span>
-                    <span className="my-0.5 w-full border-b-2 border-current opacity-80" />
-                    <span className="font-display text-3xl font-bold tabular-nums sm:text-4xl md:text-5xl">
+                    <span className="my-1 w-full border-b-2 border-current opacity-80" />
+                    <span className="font-display text-[clamp(2rem,6vmin,4rem)] font-bold tabular-nums">
                       {c.value.denominator}
                     </span>
                   </span>
                 )}
                 {c.expr !== c.label && (
-                  <span className="mt-1.5 max-w-full break-words text-center font-mono text-[10px] text-zinc-400 sm:text-xs">
+                  <span className="mt-2 max-w-full break-words text-center font-mono text-[clamp(0.6rem,1.5vmin,0.9rem)] text-zinc-400">
                     {c.expr}
                   </span>
                 )}
@@ -195,21 +192,15 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
         </div>
       </section>
 
-      <section className="w-full">
-        <h2 className="mb-4 text-center text-sm font-medium uppercase tracking-widest text-zinc-500 sm:text-base">
-          Operators
-        </h2>
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8">
+      {/* Operators - centered row */}
+      <section className="flex w-full flex-col items-center">
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
           {OPS.map(({ op: o, sym }) => (
             <motion.button
               key={o}
               onClick={() => sel && setOp(o)}
               whileTap={{ scale: 0.95 }}
-              className={
-                opBase +
-                (op === o ? opSelected : opDefault) +
-                ' h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 lg:h-32 lg:w-32 text-3xl sm:text-4xl md:text-5xl lg:text-6xl'
-              }
+              className={opStyle + (op === o ? opSelected : opDefault)}
             >
               {sym}
             </motion.button>
@@ -217,15 +208,13 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
         </div>
       </section>
 
-      <section className="w-full">
-        <h2 className="mb-4 text-center text-sm font-medium uppercase tracking-widest text-zinc-500 sm:text-base">
-          Actions
-        </h2>
-        <div className="flex justify-center gap-4 sm:gap-6">
+      {/* Actions - centered row */}
+      <section className="flex w-full flex-col items-center">
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
           <motion.button
             onClick={loadNewPuzzle}
             whileTap={{ scale: 0.97 }}
-            className={actionBase + actionDefault}
+            className={actionStyle + actionDefault}
           >
             New
           </motion.button>
@@ -234,7 +223,7 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
             disabled={hist.length === 0}
             whileTap={hist.length > 0 ? { scale: 0.97 } : {}}
             className={
-              actionBase +
+              actionStyle +
               (hist.length === 0 ? actionDisabled : actionDefault)
             }
           >
@@ -250,9 +239,9 @@ export function Game({ puzzles }: { puzzles: Puzzle[] }) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="rounded-2xl bg-emerald-600/90 px-8 py-4 shadow-lg"
+            className="rounded-3xl bg-emerald-600 px-10 py-5 shadow-xl"
           >
-            <p className="font-display text-xl font-bold text-white">
+            <p className="font-display text-2xl font-bold text-white">
               {hist.length + 1} steps
             </p>
           </motion.div>
