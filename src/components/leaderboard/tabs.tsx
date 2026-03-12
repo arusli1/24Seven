@@ -27,15 +27,15 @@ export function LeaderboardTabs() {
 
   return (
     <Card className="overflow-hidden">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap justify-center gap-3">
         {TIME_LIMITS.map((limit) => (
           <button
             key={limit}
             onClick={() => setActive(limit)}
-            className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
+            className={`rounded-lg px-5 py-3 text-base font-medium transition-all sm:text-lg ${
               active === limit
-                ? 'bg-[rgb(var(--accent))] text-white shadow-panel'
-                : 'bg-[rgb(var(--bg-base))] text-[rgb(var(--ink-muted))] hover:bg-[rgb(var(--border))]/50'
+                ? 'bg-[rgb(var(--accent))] text-black'
+                : 'bg-white/[0.04] text-zinc-400 hover:bg-white/[0.08] hover:text-white'
             }`}
           >
             {limit}s
@@ -43,29 +43,29 @@ export function LeaderboardTabs() {
         ))}
       </div>
       <div className="mt-6">
-        {isLoading && <p className="text-sm text-[rgb(var(--ink-muted))]">Loading…</p>}
+        {isLoading && <p className="text-sm text-zinc-400">Loading…</p>}
         {!isLoading && (
           <ol className="space-y-2">
             {data?.map((entry, index) => (
               <li
                 key={entry.id}
-                className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))]/40 bg-[rgb(var(--bg-base))]/60 px-4 py-3 transition-colors hover:bg-[rgb(var(--accent-soft))]/30"
+                className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3 transition-colors hover:bg-white/[0.04]"
               >
                 <div>
-                  <p className="font-semibold text-[rgb(var(--ink))]">
+                  <p className="text-lg font-medium text-white">
                     #{index + 1} {entry.nickname}
                   </p>
-                  <p className="text-xs text-[rgb(var(--ink-muted))]">
+                  <p className="text-sm text-zinc-400 sm:text-base">
                     Solved {entry.puzzlesSolved} • Avg {(entry.averageSolveMs / 1000).toFixed(2)}s
                   </p>
                 </div>
-                <span className="text-xs text-[rgb(var(--ink-subtle))]">
+                <span className="text-sm text-zinc-500">
                   {new Date(entry.createdAt).toLocaleDateString()}
                 </span>
               </li>
             ))}
             {(!data || data.length === 0) && (
-              <p className="py-8 text-center text-sm text-[rgb(var(--ink-muted))]">No entries yet.</p>
+              <p className="py-8 text-center text-sm text-zinc-400">No entries yet.</p>
             )}
           </ol>
         )}

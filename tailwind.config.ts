@@ -16,24 +16,22 @@ const config: Config = {
         'accent-soft': 'rgb(var(--accent-soft))',
       },
       fontFamily: {
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
-        display: ['Syne', 'sans-serif'],
-        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        mono: ['ui-monospace', 'monospace'],
       },
       boxShadow: {
-        panel: 'var(--shadow-md)',
-        'panel-lg': 'var(--shadow-lg)',
-        glow: 'var(--shadow-glow)',
-        'inner-soft': 'inset 0 2px 4px rgba(0,0,0,0.04)',
+        panel: '0 1px 0 rgba(255,255,255,0.05), 0 4px 24px rgba(0,0,0,0.4)',
+        'panel-lg': '0 1px 0 rgba(255,255,255,0.06), 0 8px 40px rgba(0,0,0,0.5)',
+        glow: '0 0 60px rgba(34, 211, 238, 0.15)',
+        'inner-soft': 'inset 0 1px 0 rgba(255,255,255,0.04)',
       },
       borderRadius: {
-        card: 'var(--radius-2xl)',
+        card: '12px',
         pill: '9999px',
       },
       animation: {
         'fade-in': 'fadeIn 0.4s ease-out',
         'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        'scale-in': 'scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
       },
       keyframes: {
         fadeIn: {
@@ -41,12 +39,8 @@ const config: Config = {
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(12px)' },
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        scaleIn: {
-          '0%': { opacity: '0', transform: 'scale(0.95)' },
-          '100%': { opacity: '1', transform: 'scale(1)' },
         },
       },
     },

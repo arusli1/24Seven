@@ -153,19 +153,19 @@ export function SpeedrunClient({ puzzles }: Props) {
   };
 
   if (!currentPuzzle) {
-    return <p className="text-sm text-rose-600">No puzzles available. Import difficulties first.</p>;
+    return <p className="text-sm text-rose-400">No puzzles available. Import difficulties first.</p>;
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-3">
+    <div className="mx-auto flex w-full max-w-2xl flex-col items-center space-y-8">
+      <div className="flex flex-wrap items-center justify-center gap-4">
         {LIMITS.map((limit) => (
           <button
             key={limit}
-            className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
+            className={`rounded-lg px-5 py-3 text-base font-medium transition-all sm:text-lg ${
               timeLimit === limit
-                ? 'bg-[rgb(var(--accent))] text-white shadow-panel'
-                : 'bg-[rgb(var(--bg-base))] text-[rgb(var(--ink-muted))] hover:bg-[rgb(var(--border))]/50'
+                ? 'bg-[rgb(var(--accent))] text-black'
+                : 'bg-white/[0.04] text-zinc-400 hover:bg-white/[0.08] hover:text-white'
             }`}
             onClick={() => setTimeLimit(limit)}
             disabled={running}
@@ -176,7 +176,7 @@ export function SpeedrunClient({ puzzles }: Props) {
         <Button onClick={startRun} size="lg">
           {running ? 'Restart' : 'Start speedrun'}
         </Button>
-        <span className="rounded-xl bg-[rgb(var(--ink))] px-4 py-2 font-mono text-sm font-semibold text-white">
+        <span className="rounded-lg bg-white/[0.08] px-5 py-2.5 font-mono text-base font-medium text-white sm:text-lg">
           {(timeLeft / 1000).toFixed(1)}s left
         </span>
       </div>
@@ -191,20 +191,22 @@ export function SpeedrunClient({ puzzles }: Props) {
         onCheck={handleCheck}
       />
 
-      <p className="text-sm text-[rgb(var(--ink-muted))]">{status || 'Type your expression and press Enter.'}</p>
+      <p className="text-center text-base text-zinc-400 sm:text-lg">{status || 'Type your expression and press Enter.'}</p>
 
-      <Keypad onInsert={(value) => setExpression((prev) => `${prev}${value}`)} />
+      <div className="flex justify-center">
+        <Keypad onInsert={(value) => setExpression((prev) => `${prev}${value}`)} />
+      </div>
 
       {!running && puzzlesSolved > 0 && (
-        <div className="space-y-5 rounded-3xl border border-[rgb(var(--border))]/60 bg-[rgb(var(--surface))] p-6 shadow-panel sm:p-8">
-          <h3 className="font-display text-xl font-semibold text-[rgb(var(--ink))]">Run summary</h3>
+        <div className="w-full max-w-2xl space-y-5 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 sm:p-10">
+          <h3 className="text-xl font-semibold text-white sm:text-2xl">Run summary</h3>
           <SpeedrunStats summary={summary} />
           <div className="space-y-3">
-            <label className="text-sm font-medium text-[rgb(var(--ink))]">Submit to leaderboard</label>
+            <label className="text-base font-medium text-white sm:text-lg">Submit to leaderboard</label>
             <input
               value={nickname}
               onChange={(event) => setNickname(event.target.value)}
-              className="w-full rounded-xl border-2 border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-4 py-2.5 transition-colors placeholder:text-[rgb(var(--ink-subtle))] focus:border-[rgb(var(--accent))] focus:outline-none"
+              className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-2.5 text-white placeholder:text-zinc-500 focus:border-[rgb(var(--accent))]/50 focus:outline-none focus:ring-1 focus:ring-[rgb(var(--accent))]/30"
               placeholder="Nickname"
             />
             <Button onClick={submitScore} disabled={saving} size="lg">

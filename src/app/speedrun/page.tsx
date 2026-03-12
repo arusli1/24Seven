@@ -4,12 +4,12 @@ import { loadPuzzles } from '@/lib/difficulty';
 export default function SpeedrunPage() {
   const puzzles = loadPuzzles();
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
-      <header className="mb-10">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-[rgb(var(--ink))] sm:text-4xl">
+    <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center px-6 py-10 sm:px-10 sm:py-14 lg:max-w-6xl lg:px-16 lg:py-16">
+      <header className="mb-12 max-w-2xl text-center">
+        <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
           Speedrun
         </h1>
-        <p className="mt-2 text-[rgb(var(--ink-muted))]">
+        <p className="mt-3 text-xl text-zinc-400 sm:text-2xl">
           Solve as many as you can before time runs out.
         </p>
       </header>

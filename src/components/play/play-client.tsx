@@ -13,6 +13,13 @@ interface Props {
 
 type Operator = '+' | '-' | '*' | '/';
 
+const OPERATORS: { op: Operator; symbol: string }[] = [
+  { op: '+', symbol: '+' },
+  { op: '-', symbol: '−' },
+  { op: '*', symbol: '×' },
+  { op: '/', symbol: '÷' },
+];
+
 interface CardState {
   id: string;
   value: Rational;
@@ -124,46 +131,47 @@ export function PlayClient({ puzzles }: Props) {
   };
 
   if (!currentPuzzle) {
-    return <p className="text-sm text-rose-600">No puzzles. Run <code>npm run import:difficulties</code></p>;
+    return <p className="text-center text-lg text-rose-400">No puzzles. Run <code className="text-rose-300">npm run import:difficulties</code></p>;
   }
 
   return (
-    <div className="space-y-6">
-      <Card className="space-y-6">
-        <div className="flex items-center justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={() => setPuzzleIndex((prev) => prev + 1)}>
+    <div className="mx-auto flex max-w-3xl flex-col items-center space-y-8">
+      <Card className="w-full max-w-2xl space-y-8">
+        <div className="flex items-center justify-center gap-4">
+          <Button variant="outline" size="md" onClick={() => setPuzzleIndex((prev) => prev + 1)}>
             New puzzle
           </Button>
-          <Button variant="ghost" size="sm" onClick={undoLast} disabled={history.length === 0}>
+          <Button variant="ghost" size="md" onClick={undoLast} disabled={history.length === 0}>
             Undo
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
           {cards.map((card) => (
             <button
               key={card.id}
               onClick={() => handleCardClick(card.id)}
-              className={`flex flex-col items-center justify-center rounded-2xl border-2 px-4 py-5 text-center transition-all duration-200 active:scale-[0.98] ${
+              className={`flex flex-col items-center justify-center rounded-2xl border-2 px-6 py-8 text-center transition-all duration-200 active:scale-[0.98] sm:px-8 sm:py-10 ${
                 selectedCard === card.id
-                  ? 'border-[rgb(var(--accent))] bg-[rgb(var(--accent-soft))] shadow-panel'
+                  ? 'border-[rgb(var(--accent))] bg-[rgb(var(--accent))]/10'
                   : solved && cards[0].id === card.id
-                    ? 'border-emerald-400 bg-emerald-50 shadow-panel'
-                    : 'border-[rgb(var(--border))] bg-[rgb(var(--surface))] hover:border-[rgb(var(--accent))]/40 hover:shadow-panel'
+                    ? 'border-emerald-500/50 bg-emerald-500/10'
+                    : 'border-white/[0.08] bg-white/[0.04] hover:border-white/[0.12] hover:bg-white/[0.06]'
               }`}
             >
-              <p className="font-display text-2xl font-bold text-[rgb(var(--ink))] sm:text-3xl">{card.label}</p>
-              <p className="mt-1 font-mono text-xs text-[rgb(var(--ink-muted))]">{card.expression}</p>
+              <p className="text-4xl font-semibold text-white sm:text-5xl">{card.label}</p>
+              <p className="mt-2 font-mono text-base text-zinc-400">{card.expression}</p>
             </button>
           ))}
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {(['+', '-', '*', '/'] as Operator[]).map((op) => (
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          {OPERATORS.map(({ op, symbol }) => (
             <Button
               key={op}
               variant={operator === op ? 'solid' : 'outline'}
-              size="sm"
+              size="lg"
+              className="min-w-[4rem] text-2xl"
               onClick={() => {
                 if (!selectedCard) {
                   setMessage('Select a card first.');
@@ -173,38 +181,38 @@ export function PlayClient({ puzzles }: Props) {
                 setMessage('Select another card to apply the operator.');
               }}
             >
-              {op}
+              {symbol}
             </Button>
           ))}
         </div>
 
-        <p className="text-sm text-[rgb(var(--ink-muted))]">{message}</p>
+        <p className="text-center text-base text-zinc-400 sm:text-lg">{message}</p>
         {solved && (
-          <p className="text-sm font-semibold text-emerald-600">
+          <p className="text-center text-base font-medium text-emerald-400 sm:text-lg">
             Solved in {history.length + 1} steps. {cards[0]?.expression}
           </p>
         )}
       </Card>
 
-      <Card className="space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-medium text-[rgb(var(--ink))]">Hints</p>
+      <Card className="w-full max-w-2xl space-y-6">
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+          <p className="text-xl font-medium text-white">Hints</p>
           <Button
             variant="outline"
-            size="sm"
+            size="md"
             onClick={() => setVisibleHints((prev) => Math.min(prev + 1, hints.length))}
             disabled={visibleHints >= hints.length}
           >
             Reveal hint
           </Button>
         </div>
-        {visibleHints === 0 && <p className="text-sm text-[rgb(var(--ink-muted))]">No hints shown.</p>}
-        <ul className="space-y-2 text-sm text-[rgb(var(--ink))]">
+        {visibleHints === 0 && <p className="text-center text-base text-zinc-400 sm:text-lg">No hints shown.</p>}
+        <ul className="space-y-3 text-base text-zinc-300 sm:text-lg">
           {hints.slice(0, visibleHints).map((hint, index) => (
-            <li key={index} className="flex flex-wrap items-center gap-2">
+            <li key={index} className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               {hint.description}
               {hint.expression && (
-                <span className="font-mono text-xs text-[rgb(var(--ink-muted))]">{hint.expression}</span>
+                <span className="font-mono text-sm text-zinc-500">{hint.expression}</span>
               )}
             </li>
           ))}

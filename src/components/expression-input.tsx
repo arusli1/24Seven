@@ -17,14 +17,14 @@ export function ExpressionInput({ value, onChange, onCheck, onClear, onBackspace
   };
 
   return (
-    <div className="flex flex-col gap-3">
-      <label htmlFor="expression" className="text-sm font-semibold uppercase tracking-wide text-[rgb(var(--ink-muted))]">
+    <div className="flex w-full max-w-md flex-col items-center gap-4">
+      <label htmlFor="expression" className="w-full text-center text-base font-medium text-zinc-400 sm:text-lg">
         Your expression
       </label>
       <input
         id="expression"
-        className="rounded-xl border-2 border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-4 py-3 font-mono text-lg shadow-inner-soft transition-colors placeholder:text-[rgb(var(--ink-subtle))] focus:border-[rgb(var(--accent))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))]/20"
-        placeholder="(8 / (3 - 2)) * 6"
+        className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-5 py-4 font-mono text-xl text-white placeholder:text-zinc-500 focus:border-[rgb(var(--accent))]/50 focus:outline-none focus:ring-1 focus:ring-[rgb(var(--accent))]/30"
+        placeholder="(8 ÷ (3 − 2)) × 6"
         value={value}
         onChange={handleChange}
         onKeyDown={(event) => {
@@ -34,7 +34,7 @@ export function ExpressionInput({ value, onChange, onCheck, onClear, onBackspace
           }
         }}
       />
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap justify-center gap-3">
         <Button onClick={onCheck} size="lg">
           Check
         </Button>
