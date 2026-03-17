@@ -2,11 +2,14 @@
 
 import { useState } from 'react';
 import { Game } from '@/components/game';
+import { DailyGame } from '@/components/daily-game';
 import { Solver } from '@/components/solver';
 import { Puzzle } from '@/lib/types';
 
+type Tab = 'play' | 'daily' | 'solver';
+
 export function ModeSwitcher({ puzzles }: { puzzles: Puzzle[] }) {
-  const [mode, setMode] = useState<'play' | 'solver'>('play');
+  const [mode, setMode] = useState<Tab>('play');
 
   return (
     <>
@@ -18,13 +21,21 @@ export function ModeSwitcher({ puzzles }: { puzzles: Puzzle[] }) {
           Play
         </button>
         <button
+          onClick={() => setMode('daily')}
+          className={`game24-tab ${mode === 'daily' ? 'active' : ''}`}
+        >
+          Daily
+        </button>
+        <button
           onClick={() => setMode('solver')}
           className={`game24-tab ${mode === 'solver' ? 'active' : ''}`}
         >
           Solver
         </button>
       </div>
-      {mode === 'play' ? <Game puzzles={puzzles} /> : <Solver />}
+      {mode === 'play' && <Game puzzles={puzzles} />}
+      {mode === 'daily' && <DailyGame puzzles={puzzles} />}
+      {mode === 'solver' && <Solver />}
     </>
   );
 }
